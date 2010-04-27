@@ -32,10 +32,10 @@ WYMeditor.WymClassExplorer.prototype.initIframe = function(iframe) {
     //This function is executed twice, though it is called once!
     //But MSIE needs that, otherwise designMode won't work.
     //Weird.
-    
+
     this._iframe = iframe;
     this._doc = iframe.contentWindow.document;
-    
+
     //add css rules from options
     var styles = this._doc.styleSheets[0];
     var aCss = eval(this._options.editorStyles);
@@ -46,13 +46,13 @@ WYMeditor.WymClassExplorer.prototype.initIframe = function(iframe) {
 
     //set the text direction
     jQuery('html', this._doc).attr('dir', this._options.direction);
-    
+
     //init html value
     jQuery(this._doc.body).html(this._wym._html);
-    
+
     //handle events
     var wym = this;
-    
+
     this._doc.body.onfocus = function()
       {wym._doc.designMode = "on"; wym._doc = iframe.contentWindow.document;};
     this._doc.onbeforedeactivate = function() {wym.saveCaret();};
@@ -61,49 +61,53 @@ WYMeditor.WymClassExplorer.prototype.initIframe = function(iframe) {
       wym.keyup();
     };
     this._doc.onclick = function() {wym.saveCaret();};
-    
+
     this._doc.body.onbeforepaste = function() {
       wym._iframe.contentWindow.event.returnValue = false;
     };
-    
+
     this._doc.body.onpaste = function() {
       wym._iframe.contentWindow.event.returnValue = false;
       wym.paste(window.clipboardData.getData("Text"));
     };
-    
+
     //callback can't be executed twice, so we check
     if(this._initialized) {
-      
+
       //pre-bind functions
       if(jQuery.isFunction(this._options.preBind)) this._options.preBind(this);
-      
+
       //bind external events
       this._wym.bindEvents();
-      
+
       //post-init functions
       if(jQuery.isFunction(this._options.postInit)) this._options.postInit(this);
-      
+
       //add event listeners to doc elements, e.g. images
       this.listen();
     }
-    
+
     this._initialized = true;
-    
+
     //init designMode
     this._doc.designMode="on";
     try{
         // (bermi's note) noticed when running unit tests on IE6
         // Is this really needed, it trigger an unexisting property on IE6
-        this._doc = iframe.contentWindow.document; 
+        this._doc = iframe.contentWindow.document;
     }catch(e){}
+
+	// Mark container items as unselectable
+	// Fix for issue explained: http://stackoverflow.com/questions/1470932/ie8-iframe-designmode-loses-selection
+	jQuery('div.wym_containers a').attr('unselectable', 'on');
 };
 
 WYMeditor.WymClassExplorer.prototype._exec = function(cmd,param) {
 
     switch(cmd) {
-    
+
     case WYMeditor.INDENT: case WYMeditor.OUTDENT:
-    
+
         var container = this.findUp(this.container(), WYMeditor.LI);
         if(container) {
             var ancestor = container.parentNode.parentNode;
@@ -195,7 +199,7 @@ WYMeditor.WymClassExplorer.prototype.keyup = function() {
 WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node, toStart) {
     var range = this._doc.selection.createRange();
     toStart = toStart ? true : false;
-    
+
     range.moveToElementText(node);
     range.collapse(toStart);
     range.select();
