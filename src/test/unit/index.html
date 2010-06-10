@@ -31,6 +31,10 @@
 <script type="text/javascript" src="testrunner.js"></script>
 <script type="text/javascript">
 
+function htmlEquals(wymeditor, expected){
+    equals( jQuery.trim( wymeditor.xhtml() ), jQuery.trim( expected ) );
+}
+
 module("Core");
 
 test("Instantiate", function() {
@@ -98,6 +102,8 @@ test("Should remove PRE line breaks (BR)", function() {
     equals( jQuery.wymeditors(0).parser.parse(original), expected, "Remove BR in PRE" );
 });
 
+
+
 function runPostInitTests() {
     module("Post Init");
 
@@ -112,6 +118,104 @@ function runPostInitTests() {
         jQuery.wymeditors(0).paste( testText2 );
         equals( jQuery.trim( jQuery.wymeditors(0).xhtml() ), testText1 + '<p>' + testText2 + '<\/p>' );
 
+    });
+
+    module("List Manipulation");
+
+    var nestedListHtml = '' +
+    '<ol>' +
+        '<li>one</li>' +
+        '<li>two' +
+            '<ol>' +
+                '<li>two- one</li>' +
+                '<li>two- two</li>' +
+            '</ol>' +
+        '</li>' +
+    '</ol>';
+
+    test("Top-level list indent", function() {
+        expect(1);
+
+        var wymeditor = jQuery.wymeditors(0);
+        wymeditor.html(nestedListHtml);
+
+        var $body = $(wymeditor._doc).find('body.wym_iframe');
+        var $ol = $body.find('ol:first');
+
+        var $secondLi = $ol.find('li')[0];
+
+        var sel = wymeditor._iframe.contentWindow.getSelection();
+
+        var range = document.createRange();
+        range.setStart($secondLi, 0);
+        range.setEnd($secondLi, 0);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        // Click the indent button
+        var indent_button = jQuery(wymeditor._box)
+            .find(wymeditor._options.toolsSelector)
+            .find('.wym_tools_indent a');
+        indent_button.click();
+
+        //Make sure the second item was indented
+        var expectedListHtml = '' +
+        '<ol>' +
+            '<li>one' +
+                '<ol>' +
+                    '<li>two</li>' +
+                    '<li>two- one</li>' +
+                    '<li>two- two</li>' +
+                '</ol>' +
+            '</li>' +
+        '</ol>';
+
+        htmlEquals(wymeditor, expectedListHtml)
+    });
+
+    test("Second-level list indent", function() {
+        expect(1);
+
+        var wymeditor = jQuery.wymeditors(0);
+        wymeditor.html(nestedListHtml);
+
+        var $body = $(wymeditor._doc).find('body.wym_iframe');
+        var $ol = $body.find('ol:first');
+
+        var $twoTwoLi = $ol.find('ol li')[1];
+
+        var sel = wymeditor._iframe.contentWindow.getSelection();
+
+        var range = document.createRange();
+        range.setStart($twoTwoLi, 0);
+        range.setEnd($twoTwoLi, 0);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        // Click the indent button
+        var indent_button = jQuery(wymeditor._box)
+            .find(wymeditor._options.toolsSelector)
+            .find('.wym_tools_indent a');
+        indent_button.click();
+
+        //Make sure the 4th item was indented
+        var expectedListHtml = '' +
+        '<ol>' +
+            '<li>one</li>' +
+            '<li>two' +
+                '<ol>' +
+                    '<li>two- one' +
+                        '<ol>' +
+                            '<li>two- two</li>' +
+                        '</ol>' +
+                    '</li>' +
+                '</ol>' +
+            '</li>' +
+        '</ol>';
+
+        htmlEquals(wymeditor, expectedListHtml)
     });
 };
 
