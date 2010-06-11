@@ -29,49 +29,49 @@ WYMeditor.WymClassMozilla = function(wym) {
 
 WYMeditor.WymClassMozilla.prototype.initIframe = function(iframe) {
     var wym = this;
-    
+
     this._iframe = iframe;
     this._doc = iframe.contentDocument;
-    
+
     //add css rules from options
-    
-    var styles = this._doc.styleSheets[0];    
+
+    var styles = this._doc.styleSheets[0];
     var aCss = eval(this._options.editorStyles);
-    
+
     this.addCssRules(this._doc, aCss);
 
     this._doc.title = this._wym._index;
 
     //set the text direction
     jQuery('html', this._doc).attr('dir', this._options.direction);
-    
+
     //init html value
     this.html(this._wym._html);
-    
+
     //init designMode
     this.enableDesignMode();
-    
+
     //pre-bind functions
     if(jQuery.isFunction(this._options.preBind)) this._options.preBind(this);
-    
+
     //bind external events
     this._wym.bindEvents();
-    
+
     //bind editor keydown events
     jQuery(this._doc).bind("keydown", this.keydown);
-    
+
     //bind editor keyup events
     jQuery(this._doc).bind("keyup", this.keyup);
-    
+
     //bind editor focus events (used to reset designmode - Gecko bug)
-    jQuery(this._doc).bind("focus", function () { 
+    jQuery(this._doc).bind("focus", function () {
         // Fix scope
         wym.enableDesignMode.call(wym);
     });
-    
+
     //post-init functions
     if(jQuery.isFunction(this._options.postInit)) this._options.postInit(this);
-    
+
     //add event listeners to doc elements, e.g. images
     this.listen();
 };
@@ -82,10 +82,10 @@ WYMeditor.WymClassMozilla.prototype.initIframe = function(iframe) {
 WYMeditor.WymClassMozilla.prototype.html = function(html) {
 
   if(typeof html === 'string') {
-  
+
     //disable designMode
     try { this._doc.designMode = "off"; } catch(e) { };
-    
+
     //replace em by i and strong by bold
     //(designMode issue)
     html = html.replace(/<em(\b[^>]*)>/gi, "<i$1>")
@@ -95,7 +95,7 @@ WYMeditor.WymClassMozilla.prototype.html = function(html) {
 
     //update the html body
     jQuery(this._doc.body).html(html);
-    
+
     //re-init designMode
     this.enableDesignMode();
   }
@@ -107,17 +107,17 @@ WYMeditor.WymClassMozilla.prototype._exec = function(cmd,param) {
     if(!this.selected()) return(false);
 
     switch(cmd) {
-    
+
     case WYMeditor.INDENT: case WYMeditor.OUTDENT:
-    
-        var focusNode = this.selected();    
+
+        var focusNode = this.selected();
         var sel = this._iframe.contentWindow.getSelection();
         var anchorNode = sel.anchorNode;
         if(anchorNode.nodeName == "#text") anchorNode = anchorNode.parentNode;
-        
+
         focusNode = this.findUp(focusNode, WYMeditor.BLOCKS);
         anchorNode = this.findUp(anchorNode, WYMeditor.BLOCKS);
-        
+
         if(focusNode && focusNode == anchorNode
           && focusNode.tagName.toLowerCase() == WYMeditor.LI) {
 
@@ -130,13 +130,13 @@ WYMeditor.WymClassMozilla.prototype._exec = function(cmd,param) {
         }
 
     break;
-    
+
     default:
 
         if(param) this._doc.execCommand(cmd,'',param);
         else this._doc.execCommand(cmd,'',null);
     }
-    
+
     //set to P if parent = BODY
     var container = this.selected();
     if(container.tagName.toLowerCase() == WYMeditor.BODY)
@@ -165,10 +165,10 @@ WYMeditor.WymClassMozilla.prototype.addCssRule = function(styles, oCss) {
 
 //keydown handler, mainly used for keyboard shortcuts
 WYMeditor.WymClassMozilla.prototype.keydown = function(evt) {
-  
+
   //'this' is the doc
   var wym = WYMeditor.INSTANCES[this.title];
-  var container = null;  
+  var container = null;
 
   if(evt.ctrlKey){
     if(evt.keyCode == 66){
@@ -200,27 +200,27 @@ WYMeditor.WymClassMozilla.prototype.keyup = function(evt) {
 
   //'this' is the doc
   var wym = WYMeditor.INSTANCES[this.title];
-  
+
   wym._selected_image = null;
   var container = null;
 
   if(evt.keyCode == 13 && !evt.shiftKey) {
-  
+
     //RETURN key
     //cleanup <br><br> between paragraphs
     jQuery(wym._doc.body).children(WYMeditor.BR).remove();
   }
-  
+
   if(evt.keyCode != 8
        && evt.keyCode != 17
        && evt.keyCode != 46
        && evt.keyCode != 224
        && !evt.metaKey
        && !evt.ctrlKey) {
-      
+
     //NOT BACKSPACE, NOT DELETE, NOT CTRL, NOT COMMAND
     //text nodes replaced by P
-    
+
     container = wym.selected();
     var name = container.tagName.toLowerCase();
 
@@ -265,16 +265,29 @@ WYMeditor.WymClassMozilla.prototype.openBlockTag = function(tag, attributes)
       return;
     }
   }
-  
+
   this.output += this.helper.tag(tag, attributes, true);
 };
 
 WYMeditor.WymClassMozilla.prototype.getTagForStyle = function(style) {
 
-  if(/bold/.test(style)) return 'strong';
-  if(/italic/.test(style)) return 'em';
-  if(/sub/.test(style)) return 'sub';
-  if(/super/.test(style)) return 'sup';
-  return false;
+    if(/bold/.test(style)) return 'strong';
+    if(/italic/.test(style)) return 'em';
+    if(/sub/.test(style)) return 'sub';
+    if(/super/.test(style)) return 'sup';
+    return false;
+};
+
+
+/**
+ * Starting with FF 3.6, inserted tables need some content in their cells before
+ * they're editable. Also need content after the table, otherwise it isn't
+ * possible to add content after a table at the end of a document.
+ */
+WYMeditor.WymClassMozilla.prototype.afterInsertTable = function(table) {
+    // Ensure there is content in the table cells, so that they're editable
+    $(table).find('td').each(function(index, element){
+        $(element).append('<br _moz_dirty="">');
+    });
 };
 

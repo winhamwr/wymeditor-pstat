@@ -35,6 +35,22 @@ function htmlEquals(wymeditor, expected){
     equals( jQuery.trim( wymeditor.xhtml() ), jQuery.trim( expected ) );
 }
 
+/**
+ * Determine if this element is editable.
+ * Mimics https://developer.mozilla.org/en/DOM/element.isContentEditable
+ */
+function isContentEditable(element) {
+    if(element.contentEditable == '' || element.contentEditable == null){
+        return true;
+    }else if(element.contentEditable == true) {
+        return true;
+    }else if(element.contentEditable == false) {
+        return false;
+    }else {
+        return isContentEditable(element.parentNode);
+    }
+}
+
 module("Core");
 
 test("Instantiate", function() {
@@ -217,6 +233,43 @@ function runPostInitTests() {
 
         htmlEquals(wymeditor, expectedListHtml)
     });
+
+    module("Table Insertion");
+
+    test("Table is editable after insertion", function() {
+        expect(7);
+
+        var wymeditor = jQuery.wymeditors(0);
+        wymeditor.html('');
+
+        var $body = $(wymeditor._doc).find('body.wym_iframe');
+        wymeditor.insertTable(3, 2, '', '');
+
+        $body.find('td').each(function(index, td) {
+            equals( isContentEditable(td), true);
+        });
+
+        var dm = wymeditor._doc.designMode
+        ok(dm == 'on' || dm == 'On');
+    });
+
+    // Only FF > 3.5 seems to require content in <td> for them to be editable
+    if($.browser.mozilla && $.browser.version >= '1.9.2') {
+        test("Table cells have content after creation", function() {
+            expect(6);
+
+            var wymeditor = jQuery.wymeditors(0);
+            wymeditor.html('');
+
+            var $body = $(wymeditor._doc).find('body.wym_iframe');
+            wymeditor.insertTable(3, 2, '', '');
+
+            $body.find('td').each(function(index, td) {
+                equals( td.childNodes.length, 1);
+            });
+        });
+    }
+
 };
 
 </script>
