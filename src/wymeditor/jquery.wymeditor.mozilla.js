@@ -286,8 +286,12 @@ WYMeditor.WymClassMozilla.prototype.getTagForStyle = function(style) {
  */
 WYMeditor.WymClassMozilla.prototype.afterInsertTable = function(table) {
     // Ensure there is content in the table cells, so that they're editable
-    $(table).find('td').each(function(index, element){
-        $(element).append('<br _moz_dirty="">');
-    });
+    if($.browser.version >= '1.9.2') {
+        $(table).find('td').each(function(index, element){
+            $(element).append('<br _moz_dirty="">');
+        });
+    }
+
+
 };
 
