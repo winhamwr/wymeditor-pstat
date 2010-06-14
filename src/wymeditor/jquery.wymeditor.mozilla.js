@@ -292,6 +292,22 @@ WYMeditor.WymClassMozilla.prototype.afterInsertTable = function(table) {
         });
     }
 
+    // Make sure that we still have a bogus node at both the begining and end
+    var $body = $(this._doc).find('body.wym_iframe');
+    var children = $body.children();
+    var placeholder_node = '<br _moz_editor_bogus_node="TRUE" _moz_dirty="">';
+
+    if(children.length > 0) {
+        var $first_child = $(children[0]);
+        var $last_child = $(children[children.length - 1]);
+
+        if($first_child.is('table')) {
+            $first_child.before(placeholder_node);
+        }
+        if($last_child.is('table')) {
+            $last_child.after(placeholder_node);
+        }
+    }
 
 };
 

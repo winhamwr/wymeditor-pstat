@@ -138,7 +138,7 @@ function runPostInitTests() {
 
 	test("Adding combined CSS selectors", function () {
         expect(1);
-        
+
         var doc = jQuery.wymeditors(0)._doc,
             styles = doc.styleSheets[0];
 
@@ -169,13 +169,15 @@ function runPostInitTests() {
         var $body = $(wymeditor._doc).find('body.wym_iframe');
         var $ol = $body.find('ol:first');
 
-        var $secondLi = $ol.find('li')[0];
+        var secondLi = $ol.find('li')[0];
 
-        var sel = wymeditor._iframe.contentWindow.getSelection();
+
+        //var sel = wymeditor._iframe.contentWindow.getSelection();
+		var sel = new DOMSelection(wymeditor._doc);
 
         var range = document.createRange();
-        range.setStart($secondLi, 0);
-        range.setEnd($secondLi, 0);
+        range.setStart(secondLi, 0);
+        range.setEnd(secondLi, 0);
 
         sel.removeAllRanges();
         sel.addRange(range);
@@ -210,13 +212,13 @@ function runPostInitTests() {
         var $body = $(wymeditor._doc).find('body.wym_iframe');
         var $ol = $body.find('ol:first');
 
-        var $twoTwoLi = $ol.find('ol li')[1];
+        var twoTwoLi = $ol.find('ol li')[1];
 
         var sel = wymeditor._iframe.contentWindow.getSelection();
 
         var range = document.createRange();
-        range.setStart($twoTwoLi, 0);
-        range.setEnd($twoTwoLi, 0);
+        range.setStart(twoTwoLi, 0);
+        range.setEnd(twoTwoLi, 0);
 
         sel.removeAllRanges();
         sel.addRange(range);
@@ -284,6 +286,76 @@ function runPostInitTests() {
             });
         });
     }
+
+	// If there is no element in front of a table in FF or ie, it's not possible
+	// to put content in front of that table.
+	test("Tables at ends have <br> placeholder in front/back", function() {
+        expect(2);
+
+        var wymeditor = jQuery.wymeditors(0);
+        wymeditor.html('');
+
+        var $body = $(wymeditor._doc).find('body.wym_iframe');
+        wymeditor.insertTable(3, 2, '', '');
+
+		if($.browser.mozilla){
+			equals( $body.children().length, 3 );
+		} else{
+			equals( $body.children().length, 2 );
+		}
+
+		// Should have a br as the first child of the body
+		var first_child = $body.children()[0];
+		ok($(first_child).is('br'), 'First child is a br' );
+
+		if($.browser.mozilla){
+			expect(3);
+			// In FF, need a br at the end
+			var third_child = $body.children()[2];
+			ok( $(third_child).is('br'), "Third child is a br");
+		}
+    });
+
+	test("Tables should only have <br> placeholders if they're ends", function() {
+        var wymeditor = jQuery.wymeditors(0);
+        wymeditor.html('<p>first</p><p>middle</p><p>last</p>');
+
+        var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		// Set the selectors in the middle paragraph
+		var sel = wymeditor._iframe.contentWindow.getSelection();
+
+		var middle_p = $body.find('p')[1];
+
+        var range = document.createRange();
+        range.setStart(middle_p, 0);
+        range.setEnd(middle_p, 0);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+		// Should insert the table after the middle paragraph but before last
+        wymeditor.insertTable(1, 1, 'cap', '');
+
+		var expected_html = '' +
+		'<p>first</p>' +
+		'<p>middle</p>' +
+		'<table>' +
+			'<caption>cap</caption>' +
+			'<tbody>' +
+				'<tr><td></td></tr>' +
+			'</tbody>' +
+		'</table>' +
+		'<p>last</p>';
+        htmlEquals(wymeditor, expected_html);
+
+		// Shouldn't be any <br>'s floating around
+		$body.children().each(function (index, element) {
+			ok( $(element).is('br') == false, "Child index:" + index + " is NOT br");
+		});
+
+		expect(1 + $body.children().length);
+    });
 };
 
 </script>

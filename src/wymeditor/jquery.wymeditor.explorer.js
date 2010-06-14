@@ -54,37 +54,37 @@ WYMeditor.WymClassExplorer.prototype.initIframe = function(iframe) {
     var wym = this;
 
     this._doc.body.onfocus = function()
-      {wym._doc.designMode = "on"; wym._doc = iframe.contentWindow.document;};
+        {wym._doc.designMode = "on"; wym._doc = iframe.contentWindow.document;};
     this._doc.onbeforedeactivate = function() {wym.saveCaret();};
     this._doc.onkeyup = function() {
-      wym.saveCaret();
-      wym.keyup();
+        wym.saveCaret();
+        wym.keyup();
     };
     this._doc.onclick = function() {wym.saveCaret();};
 
     this._doc.body.onbeforepaste = function() {
-      wym._iframe.contentWindow.event.returnValue = false;
+        wym._iframe.contentWindow.event.returnValue = false;
     };
 
     this._doc.body.onpaste = function() {
-      wym._iframe.contentWindow.event.returnValue = false;
-      wym.paste(window.clipboardData.getData("Text"));
+        wym._iframe.contentWindow.event.returnValue = false;
+        wym.paste(window.clipboardData.getData("Text"));
     };
 
     //callback can't be executed twice, so we check
     if(this._initialized) {
 
-      //pre-bind functions
-      if(jQuery.isFunction(this._options.preBind)) this._options.preBind(this);
+        //pre-bind functions
+        if(jQuery.isFunction(this._options.preBind)) this._options.preBind(this);
 
-      //bind external events
-      this._wym.bindEvents();
+        //bind external events
+        this._wym.bindEvents();
 
-      //post-init functions
-      if(jQuery.isFunction(this._options.postInit)) this._options.postInit(this);
+        //post-init functions
+        if(jQuery.isFunction(this._options.postInit)) this._options.postInit(this);
 
-      //add event listeners to doc elements, e.g. images
-      this.listen();
+        //add event listeners to doc elements, e.g. images
+        this.listen();
     }
 
     this._initialized = true;
@@ -97,41 +97,40 @@ WYMeditor.WymClassExplorer.prototype.initIframe = function(iframe) {
         this._doc = iframe.contentWindow.document;
     }catch(e){}
 
-	// Mark container items as unselectable
-	// Fix for issue explained: http://stackoverflow.com/questions/1470932/ie8-iframe-designmode-loses-selection
-	jQuery('div.wym_containers a').attr('unselectable', 'on');
+    // Mark container items as unselectable
+    // Fix for issue explained: http://stackoverflow.com/questions/1470932/ie8-iframe-designmode-loses-selection
+    jQuery('div.wym_containers a').attr('unselectable', 'on');
 };
 
 WYMeditor.WymClassExplorer.prototype._exec = function(cmd,param) {
 
     switch(cmd) {
 
-    case WYMeditor.INDENT: case WYMeditor.OUTDENT:
+        case WYMeditor.INDENT: case WYMeditor.OUTDENT:
 
-        var container = this.findUp(this.container(), WYMeditor.LI);
-        if(container) {
-            var ancestor = container.parentNode.parentNode;
-            if(container.parentNode.childNodes.length>1
-              || ancestor.tagName.toLowerCase() == WYMeditor.OL
-              || ancestor.tagName.toLowerCase() == WYMeditor.UL)
-              this._doc.execCommand(cmd);
-        }
-    break;
-    default:
-        if(param) this._doc.execCommand(cmd,false,param);
-        else this._doc.execCommand(cmd);
-    break;
-	}
-
+            var container = this.findUp(this.container(), WYMeditor.LI);
+            if(container) {
+                var ancestor = container.parentNode.parentNode;
+                if(container.parentNode.childNodes.length>1
+                    || ancestor.tagName.toLowerCase() == WYMeditor.OL
+                    || ancestor.tagName.toLowerCase() == WYMeditor.UL)
+                    this._doc.execCommand(cmd);
+            }
+        break;
+        default:
+            if(param) this._doc.execCommand(cmd,false,param);
+            else this._doc.execCommand(cmd);
+        break;
+    }
 };
 
 WYMeditor.WymClassExplorer.prototype.selected = function() {
 
     var caretPos = this._iframe.contentWindow.document.caretPos;
-        if(caretPos!=null) {
-            if(caretPos.parentElement!=undefined)
-              return(caretPos.parentElement());
-        }
+    if(caretPos!=null) {
+        if(caretPos.parentElement!=undefined)
+            return(caretPos.parentElement());
+    }
 };
 
 WYMeditor.WymClassExplorer.prototype.saveCaret = function() {
@@ -196,7 +195,7 @@ WYMeditor.WymClassExplorer.prototype.unwrap = function() {
 
 //keyup handler
 WYMeditor.WymClassExplorer.prototype.keyup = function() {
-  this._selected_image = null;
+    this._selected_image = null;
 };
 
 WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node, toStart) {
@@ -209,3 +208,22 @@ WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node, toStart) {
     node.focus();
 };
 
+/**
+ * Need a <br> in front of a table if it's the first block otherwise a user
+ * can't insert things in front of the table.
+ */
+WYMeditor.editor.prototype.afterInsertTable = function(table) {
+    // Make sure that we still have a bogus node at the begining
+    var $body = $(this._doc).find('body.wym_iframe');
+    var children = $body.children();
+    var placeholder_node = '<br>';
+
+    if(children.length > 0) {
+        var $first_child = $(children[0]);
+        var $last_child = $(children[children.length - 1]);
+
+        if($first_child.is('table')) {
+            $first_child.before(placeholder_node);
+        }
+    }
+};
