@@ -171,11 +171,9 @@ function runPostInitTests() {
 
         var secondLi = $ol.find('li')[0];
 
+        var sel = wymeditor._iframe.contentWindow.getSelection();
 
-        //var sel = wymeditor._iframe.contentWindow.getSelection();
-		var sel = new DOMSelection(wymeditor._doc);
-
-        var range = document.createRange();
+        var range = wymeditor._doc.createRange();
         range.setStart(secondLi, 0);
         range.setEnd(secondLi, 0);
 
@@ -216,7 +214,7 @@ function runPostInitTests() {
 
         var sel = wymeditor._iframe.contentWindow.getSelection();
 
-        var range = document.createRange();
+        var range = wymeditor._doc.createRange();
         range.setStart(twoTwoLi, 0);
         range.setEnd(twoTwoLi, 0);
 
@@ -327,7 +325,7 @@ function runPostInitTests() {
 
 		var middle_p = $body.find('p')[1];
 
-        var range = document.createRange();
+        var range = wymeditor._doc.createRange();
         range.setStart(middle_p, 0);
         range.setEnd(middle_p, 0);
 
