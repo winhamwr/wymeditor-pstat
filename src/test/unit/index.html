@@ -36,6 +36,20 @@ function htmlEquals(wymeditor, expected){
 }
 
 /**
+ * Move the selection to the start of the given element within the editor.
+ */
+function moveSelector(wymeditor, selectedElement){
+	var sel = wymeditor._iframe.contentWindow.getSelection();
+
+	var range = wymeditor._doc.createRange();
+	range.setStart(selectedElement, 0);
+	range.setEnd(selectedElement, 0);
+
+	sel.removeAllRanges();
+	sel.addRange(range);
+}
+
+/**
  * Determine if this element is editable.
  * Mimics https://developer.mozilla.org/en/DOM/element.isContentEditable
  */
@@ -93,7 +107,7 @@ test("Should escape URL's only once #69.1", function() {
 
 module("XmlParser");
 
-test("Should correct bad formated lists", function() {
+test("Should correct invalid lists", function() {
     expect(2);
     var expected = "<ul><li>a<ul><li>a.1<\/li><\/ul><\/li><li>b<\/li><\/ul>";
     // FF
@@ -169,16 +183,9 @@ function runPostInitTests() {
         var $body = $(wymeditor._doc).find('body.wym_iframe');
         var $ol = $body.find('ol:first');
 
+		// Set the selector to the secondLi
         var secondLi = $ol.find('li')[0];
-
-        var sel = wymeditor._iframe.contentWindow.getSelection();
-
-        var range = wymeditor._doc.createRange();
-        range.setStart(secondLi, 0);
-        range.setEnd(secondLi, 0);
-
-        sel.removeAllRanges();
-        sel.addRange(range);
+		moveSelector(wymeditor, secondLi);
 
         // Click the indent button
         var indent_button = jQuery(wymeditor._box)
@@ -210,16 +217,9 @@ function runPostInitTests() {
         var $body = $(wymeditor._doc).find('body.wym_iframe');
         var $ol = $body.find('ol:first');
 
+		// Set the selector to the twoTwoLi
         var twoTwoLi = $ol.find('ol li')[1];
-
-        var sel = wymeditor._iframe.contentWindow.getSelection();
-
-        var range = wymeditor._doc.createRange();
-        range.setStart(twoTwoLi, 0);
-        range.setEnd(twoTwoLi, 0);
-
-        sel.removeAllRanges();
-        sel.addRange(range);
+		moveSelector(wymeditor, twoTwoLi);
 
         // Click the indent button
         var indent_button = jQuery(wymeditor._box)
@@ -323,6 +323,29 @@ function runPostInitTests() {
 		}
     });
 
+	test("Consecutive tables have a <br> placeholder between them", function() {
+        expect(1);
+
+        var wymeditor = jQuery.wymeditors(0);
+        wymeditor.html('<p>first</p><p>last</p>');
+
+        var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		// Move the selector to the first paragraph
+		var first_p = $body.find('p')[0];
+		moveSelector(wymeditor, first_p);
+
+		// Insert two tables between the two <p> tags
+        wymeditor.insertTable(3, 2, '', '');
+        wymeditor.insertTable(3, 2, '', '');
+
+		var children = $body.children()
+
+		// Ensure there is a br with a table both before and after it
+		var table_after_spacing = $body.find('table + br').next('table');
+		equals( table_after_spacing.length, 1);
+    });
+
 	test("Tables should only have <br> placeholders if they're ends", function() {
         var wymeditor = jQuery.wymeditors(0);
         wymeditor.html('<p>first</p><p>middle</p><p>last</p>');
@@ -330,16 +353,8 @@ function runPostInitTests() {
         var $body = $(wymeditor._doc).find('body.wym_iframe');
 
 		// Set the selectors in the middle paragraph
-		var sel = wymeditor._iframe.contentWindow.getSelection();
-
 		var middle_p = $body.find('p')[1];
-
-        var range = wymeditor._doc.createRange();
-        range.setStart(middle_p, 0);
-        range.setEnd(middle_p, 0);
-
-        sel.removeAllRanges();
-        sel.addRange(range);
+		moveSelector(wymeditor, middle_p);
 
 		// Should insert the table after the middle paragraph but before last
         wymeditor.insertTable(1, 1, 'cap', '');

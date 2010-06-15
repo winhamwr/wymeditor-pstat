@@ -1142,10 +1142,10 @@ WYMeditor.editor.prototype.status = function(sMessage) {
  */
 WYMeditor.editor.prototype.update = function() {
     var html;
-    
+
     // Dirty fix to remove stray line breaks (#189)
     jQuery(this._doc.body).children(WYMeditor.BR).remove();
-    
+
     html = this.xhtml();
     jQuery(this._element).val(html);
     jQuery(this._box).find(this._options.htmlValSelector).not('.hasfocus').val(html); //#147
@@ -1221,7 +1221,7 @@ WYMeditor.editor.prototype.uniqueStamp = function() {
 /* @name paste
  * @description         Paste text into the editor below the carret,
  *                      used for "Paste from Word".
- * @param String str    String to insert, two or more newlines separates 
+ * @param String str    String to insert, two or more newlines separates
  *                      paragraphs. May contain inline HTML.
  */
 WYMeditor.editor.prototype.paste = function(str) {
@@ -1235,8 +1235,8 @@ WYMeditor.editor.prototype.paste = function(str) {
 
     // Build html
     for (var i=0, l=paragraphs.length; i < l; i++) {
-        html += '<p>' + 
-            ( paragraphs[i].split(this._newLine).join('<br />') ) + 
+        html += '<p>' +
+            ( paragraphs[i].split(this._newLine).join('<br />') ) +
             '</p>';
     }
 
@@ -1250,14 +1250,14 @@ WYMeditor.editor.prototype.paste = function(str) {
         paragraphs = jQuery(html, this._doc).appendTo(this._doc.body);
         focusNode = paragraphs[paragraphs.length - 1];
     }
-    
+
     // Do some minor cleanup (#131)
     if (jQuery(container).text() == '') {
-        jQuery(container).remove(); 
+        jQuery(container).remove();
     }
     // And remove br (if editor was empty)
     jQuery('body > br', this._doc).remove();
-    
+
     // Restore focus
     this.setFocusToNode(focusNode);
 };
@@ -1337,10 +1337,24 @@ WYMeditor.editor.prototype.insertTable = function(rows, columns, caption, summar
 	if(!node || !node.parentNode) jQuery(this._doc.body).append(table);
 	else jQuery(node).after(table);
 
+	this.separateConsecutiveTables();
 	this.afterInsertTable(table);
 
 	return table;
   }
+};
+
+/**
+ * Ensure that any consecutive tables have a placeholder <br> between them so
+ * that it is possible to place content between them.
+ */
+WYMeditor.editor.prototype.separateConsecutiveTables = function() {
+  var $body = $(this._doc).find('body.wym_iframe');
+  var placeholder_node = '<br>';
+
+  $body.find('table + table').each(function (index, table) {
+	$(table).before(placeholder_node);
+  });
 };
 
 /**
