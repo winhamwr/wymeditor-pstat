@@ -3,8 +3,8 @@ function htmlEquals( wymeditor, expected ) {
 }
 
 /**
- * Move the selection to the start of the given element within the editor.
- */
+* Move the selection to the start of the given element within the editor.
+*/
 function moveSelector( wymeditor, selectedElement ) {
 	var sel = wymeditor._iframe.contentWindow.getSelection();
 
@@ -17,9 +17,9 @@ function moveSelector( wymeditor, selectedElement ) {
 }
 
 /**
- * Determine if this element is editable.
- * Mimics https://developer.mozilla.org/en/DOM/element.isContentEditable
- */
+* Determine if this element is editable.
+* Mimics https://developer.mozilla.org/en/DOM/element.isContentEditable
+*/
 function isContentEditable( element ) {
 	if ( element.contentEditable == '' || element.contentEditable == null ) {
 		return true;
@@ -81,6 +81,8 @@ test("Should correct invalid lists", function() {
 	var design_mode_pseudo_html = "<ul><li>a<\/li><ul><li>a.1<\/li><\/ul><li>b<br><\/li><\/ul>";
 	equals( jQuery.wymeditors(0).parser.parse(design_mode_pseudo_html), expected, "on Firefox");
 	// IE
+	// IE has invalid sublist nesting
+	var expected = "<ul>\r\n<li>a<ul>\r\n<li>a.1<\/li><\/ul><\/li>\r\n<li>b<\/li><\/ul>";
 	var design_mode_pseudo_html = "<UL>\r\n<LI>a<\/LI>\r\n<UL>\r\n<LI>a.1<\/LI><\/UL>\r\n<LI>b<\/LI><\/UL>";
 	equals( jQuery.wymeditors(0).parser.parse(design_mode_pseudo_html), expected, "on IE");
 });
