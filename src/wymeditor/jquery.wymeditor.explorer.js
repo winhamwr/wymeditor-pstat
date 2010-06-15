@@ -212,7 +212,7 @@ WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node, toStart) {
  * Need a <br> in front of a table if it's the first block otherwise a user
  * can't insert things in front of the table.
  */
-WYMeditor.editor.prototype.afterInsertTable = function(table) {
+WYMeditor.WymClassExplorer.prototype.afterInsertTable = function(table) {
     // Make sure that we still have a bogus node at the begining
     var $body = $(this._doc).find('body.wym_iframe');
     var children = $body.children();

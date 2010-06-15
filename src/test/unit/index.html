@@ -290,27 +290,36 @@ function runPostInitTests() {
 	test("Tables at ends have <br> placeholder in front/back", function() {
         expect(2);
 
+		var is_double_br_browser = $.browser.mozilla || $.browser.webkit || $.browser.safari;
+
         var wymeditor = jQuery.wymeditors(0);
         wymeditor.html('');
 
         var $body = $(wymeditor._doc).find('body.wym_iframe');
         wymeditor.insertTable(3, 2, '', '');
 
-		if($.browser.mozilla){
-			equals( $body.children().length, 3 );
+		var children = $body.children()
+		if(is_double_br_browser){
+			equals( children.length, 3 );
 		} else{
-			equals( $body.children().length, 2 );
+			equals( children.length, 2 );
 		}
 
-		// Should have a br as the first child of the body
-		var first_child = $body.children()[0];
-		ok($(first_child).is('br'), 'First child is a br' );
+		var first_child = children[0];
+		var last_child = children[children.length - 1];
 
-		if($.browser.mozilla){
+		if(is_double_br_browser){
 			expect(3);
+			// Should have a br as the first child of the body
+			ok($(first_child).is('br'), 'First child is a br' );
+
 			// In FF, need a br at the end
-			var third_child = $body.children()[2];
-			ok( $(third_child).is('br'), "Third child is a br");
+			ok( $(last_child).is('br'), "Last child is a br");
+		}
+		if($.browser.msie){
+			expect(2);
+			// Should have a br as the first child of the body
+			ok($(first_child).is('br'), 'First child is a br' );
 		}
     });
 
