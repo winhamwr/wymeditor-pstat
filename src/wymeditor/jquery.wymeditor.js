@@ -94,7 +94,7 @@ jQuery.extend(WYMeditor, {
     TABLE,TD,TH,
     UL,OL,LI            - HTML elements string representation.
     CLASS,HREF,SRC,
-    TITLE,ALT           - HTML attributes string representation.
+    TITLE,REL,ALT       - HTML attributes string representation.
     DIALOG_LINK         - A link dialog type.
     DIALOG_IMAGE        - An image dialog type.
     DIALOG_TABLE        - A table dialog type.
@@ -183,6 +183,7 @@ jQuery.extend(WYMeditor, {
     HREF                : "href",
     SRC                 : "src",
     TITLE               : "title",
+    REL                 : "rel",
     ALT                 : "alt",
     DIALOG_LINK         : "Link",
     DIALOG_IMAGE        : "Image",
@@ -493,6 +494,7 @@ jQuery.fn.wymeditor = function(options) {
     hrefSelector:      ".wym_href",
     srcSelector:       ".wym_src",
     titleSelector:     ".wym_title",
+    relSelector:       ".wym_rel",
     altSelector:       ".wym_alt",
     textSelector:      ".wym_text",
 
@@ -501,7 +503,7 @@ jQuery.fn.wymeditor = function(options) {
     captionSelector:   ".wym_caption",
     summarySelector:   ".wym_summary",
 
-    submitSelector:    ".wym_submit",
+    submitSelector:    "form",
     cancelSelector:    ".wym_cancel",
     previewSelector:   "",
 
@@ -561,8 +563,12 @@ jQuery.fn.wymeditor = function(options) {
                + "<label>{Title}</label>"
                + "<input type='text' class='wym_title' value='' size='40' />"
                + "</div>"
+               + "<div class='row'>"
+               + "<label>{Relationship}</label>"
+               + "<input type='text' class='wym_rel' value='' size='40' />"
+               + "</div>"
                + "<div class='row row-indent'>"
-               + "<input class='wym_submit' type='button'"
+               + "<input class='wym_submit' type='submit'"
                + " value='{Submit}' />"
                + "<input class='wym_cancel' type='button'"
                + "value='{Cancel}' />"
@@ -593,7 +599,7 @@ jQuery.fn.wymeditor = function(options) {
                + "<input type='text' class='wym_title' value='' size='40' />"
                + "</div>"
                + "<div class='row row-indent'>"
-               + "<input class='wym_submit' type='button'"
+               + "<input class='wym_submit' type='submit'"
                + " value='{Submit}' />"
                + "<input class='wym_cancel' type='button'"
                + "value='{Cancel}' />"
@@ -628,7 +634,7 @@ jQuery.fn.wymeditor = function(options) {
                + "<input type='text' class='wym_cols' value='2' size='3' />"
                + "</div>"
                + "<div class='row row-indent'>"
-               + "<input class='wym_submit' type='button'"
+               + "<input class='wym_submit' type='submit'"
                + " value='{Submit}' />"
                + "<input class='wym_cancel' type='button'"
                + "value='{Cancel}' />"
@@ -650,7 +656,7 @@ jQuery.fn.wymeditor = function(options) {
                + "<textarea class='wym_text' rows='10' cols='50'></textarea>"
                + "</div>"
                + "<div class='row'>"
-               + "<input class='wym_submit' type='button'"
+               + "<input class='wym_submit' type='submit'"
                + " value='{Submit}' />"
                + "<input class='wym_cancel' type='button'"
                + "value='{Cancel}' />"
@@ -1530,6 +1536,7 @@ WYMeditor.INIT_DIALOG = function(index) {
     jQuery(wym._options.hrefSelector).val(jQuery(selected).attr(WYMeditor.HREF));
     jQuery(wym._options.srcSelector).val(jQuery(selected).attr(WYMeditor.SRC));
     jQuery(wym._options.titleSelector).val(jQuery(selected).attr(WYMeditor.TITLE));
+    jQuery(wym._options.relSelector).val(jQuery(selected).attr(WYMeditor.REL));
     jQuery(wym._options.altSelector).val(jQuery(selected).attr(WYMeditor.ALT));
   }
 
@@ -1544,7 +1551,7 @@ WYMeditor.INIT_DIALOG = function(index) {
   }
 
   jQuery(wym._options.dialogLinkSelector + " "
-    + wym._options.submitSelector).click(function() {
+    + wym._options.submitSelector).submit(function() {
 
       var sUrl = jQuery(wym._options.hrefSelector).val();
       if(sUrl.length > 0) {
@@ -1558,14 +1565,15 @@ WYMeditor.INIT_DIALOG = function(index) {
         }
 
         link.attr(WYMeditor.HREF, sUrl)
-            .attr(WYMeditor.TITLE, jQuery(wym._options.titleSelector).val());
+            .attr(WYMeditor.TITLE, jQuery(wym._options.titleSelector).val())
+            .attr(WYMeditor.REL, jQuery(wym._options.relSelector).val());
 
       }
       window.close();
   });
 
   jQuery(wym._options.dialogImageSelector + " "
-    + wym._options.submitSelector).click(function() {
+    + wym._options.submitSelector).submit(function() {
 
       var sUrl = jQuery(wym._options.srcSelector).val();
       if(sUrl.length > 0) {
@@ -1582,10 +1590,10 @@ WYMeditor.INIT_DIALOG = function(index) {
 
   var tableOnClick = WYMeditor.MAKE_TABLE_ONCLICK(wym);
   jQuery(wym._options.dialogTableSelector + " "
-    + wym._options.submitSelector).click(tableOnClick);
+    + wym._options.submitSelector).submit(tableOnClick);
 
   jQuery(wym._options.dialogPasteSelector + " "
-    + wym._options.submitSelector).click(function() {
+    + wym._options.submitSelector).submit(function() {
 
       var sText = jQuery(wym._options.textSelector).val();
       wym.paste(sText);
@@ -1952,10 +1960,10 @@ WYMeditor.XhtmlValidator = {
         "2":"href",
         "3":"hreflang",
         "4":"name",
-        "rel":/^(alternate|designates|stylesheet|start|next|prev|contents|index|glossary|copyright|chapter|section|subsection|appendix|help|bookmark| |shortcut|icon)+$/,
-        "rev":/^(alternate|designates|stylesheet|start|next|prev|contents|index|glossary|copyright|chapter|section|subsection|appendix|help|bookmark| |shortcut|icon)+$/,
+        "5":"rel",
+        "6":"rev",
         "shape":/^(rect|rectangle|circ|circle|poly|polygon)$/,
-        "5":"type"
+        "7":"type"
       }
     },
     "0":"abbr",
