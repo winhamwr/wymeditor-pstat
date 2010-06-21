@@ -40,7 +40,7 @@ function runListTests() {
 		'<li id="li_1">1</li>' +
 		'<li id="li_2">2' +
 			'<ol>' +
-				'<li id="1i_2_1">2_1</li>' +
+				'<li id="li_2_1">2_1</li>' +
 				'<li id="li_2_2">2_2</li>' +
 			'</ol>' +
 		'</li>' +
@@ -75,7 +75,7 @@ function runListTests() {
 		'</li>' +
 		'<li id="li_2">2' +
 			'<ol>' +
-				'<li id="1i_2_1">2_1</li>' +
+				'<li id="li_2_1">2_1</li>' +
 				'<li id="li_2_2">2_2</li>' +
 			'</ol>' +
 		'</li>' +
@@ -106,7 +106,7 @@ function runListTests() {
 		'<li id="li_1">1' +
 			'<ol>' +
 				'<li id="li_2">2</li>' +
-				'<li id="1i_2_1">2_1</li>' +
+				'<li id="li_2_1">2_1</li>' +
 				'<li id="li_2_2">2_2</li>' +
 			'</ol>' +
 		'</li>' +
@@ -137,7 +137,7 @@ function runListTests() {
 		'<li id="li_1">1</li>' +
 		'<li id="li_2">2' +
 			'<ol>' +
-				'<li id="1i_2_1">2_1' +
+				'<li id="li_2_1">2_1' +
 					'<ol>' +
 						'<li id="li_2_2">2_2</li>' +
 					'</ol>' +
@@ -171,7 +171,7 @@ function runListTests() {
 		'<li id="li_1">1</li>' +
 		'<li id="li_2">2' +
 			'<ol>' +
-				'<li id="1i_2_1">2_1</li>' +
+				'<li id="li_2_1">2_1</li>' +
 				'<li id="li_2_2">2_2</li>' +
 			'</ol>' +
 		'</li>' +
@@ -202,7 +202,7 @@ function runListTests() {
 		'<li id="li_1">1</li>' +
 		'<li id="li_2">2' +
 			'<ol>' +
-				'<li id="1i_2_1">2_1</li>' +
+				'<li id="li_2_1">2_1</li>' +
 				'<li id="li_2_2">2_2</li>' +
 			'</ol>' +
 		'</li>' +
@@ -233,7 +233,7 @@ function runListTests() {
 		'<li id="li_1">1</li>' +
 		'<li id="li_2">2' +
 			'<ol>' +
-				'<li id="1i_2_1">2_1</li>' +
+				'<li id="li_2_1">2_1</li>' +
 				'<li id="li_2_2">2_2</li>' +
 			'</ol>' +
 		'</li>' +
