@@ -96,10 +96,6 @@ WYMeditor.WymClassExplorer.prototype.initIframe = function(iframe) {
         // Is this really needed, it trigger an unexisting property on IE6
         this._doc = iframe.contentWindow.document;
     }catch(e){}
-
-    // Mark container items as unselectable
-    // Fix for issue explained: http://stackoverflow.com/questions/1470932/ie8-iframe-designmode-loses-selection
-    jQuery('div.wym_containers a').attr('unselectable', 'on');
 };
 
 (function(editorLoadSkin) {
@@ -108,7 +104,7 @@ WYMeditor.WymClassExplorer.prototype.initIframe = function(iframe) {
         // Fix for issue explained: http://stackoverflow.com/questions/1470932/ie8-iframe-designmode-loses-selection
         jQuery(this._box).find(this._options.containerSelector)
             .attr('unselectable', 'on');
-        
+
         editorLoadSkin.call(this);
     };
 })(WYMeditor.editor.prototype.loadSkin);
