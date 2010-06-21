@@ -115,7 +115,7 @@ function runPostInitTests() {
 		ok( dm == 'on' || dm == 'On' );
 	});
 
-		// Only FF > 3.5 seems to require content in <td> for them to be editable
+		// Only FF >= 3.5 seems to require content in <td> for them to be editable
 	if($.browser.mozilla) {
 		test("Table cells have content in FF > 3.5", function() {
 			expect(6);
@@ -127,7 +127,7 @@ function runPostInitTests() {
 			wymeditor.insertTable( 3, 2, '', '' );
 
 			$body.find('td').each(function(index, td) {
-				if( $.browser.version >= '1.9.2' ) {
+				if( $.browser.version >= '1.9.1' ) {
 					equals( td.childNodes.length, 1 );
 				} else {
 					equals( td.childNodes.length, 0 );
