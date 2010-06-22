@@ -92,7 +92,10 @@ function runBlockingElementTests() {
 	var h1BlockquotePreHtml = '' +
 	'<h1>h1</h1>' +
 	'<blockquote>bq1</blockquote>' +
-	'<pre>pre1<br />spaced<br /><br />double spaced</pre>';
+	'<pre>pre1\r\n' +
+	'spaced\r\n\r\n' +
+	'double  spaced' +
+	'</pre>';
 
 	// If there is no element in front of a table in FF or ie, it's not possible
 	// to put content in front of that table.
@@ -322,7 +325,7 @@ function runBlockingElementTests() {
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
 		var children = $body.children();
 
-		expect(7);
+		expect(8);
 		equals( children.length, 6 );
 		if ( children.length == 6 ) {
 			equals( children[0].tagName.toLowerCase(), 'h1' );
@@ -332,9 +335,11 @@ function runBlockingElementTests() {
 			equals( children[4].tagName.toLowerCase(), 'pre' );
 			equals( children[5].tagName.toLowerCase(), 'br' );
 		}
+
+		equals( wymeditor.xhtml(), h1BlockquotePreHtml );
 	});
 
-	test("Preformatted text doesn't have brs stripped", function() {
+	test("Preformatted text retains spacing", function() {
 		var wymeditor = jQuery.wymeditors(0);
 		wymeditor.html( h1BlockquotePreHtml );
 
