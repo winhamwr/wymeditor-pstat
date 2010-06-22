@@ -213,6 +213,7 @@ WYMeditor.WymClassSafari.prototype.keyup = function(evt) {
 	// then we should ensure that they're in the proper format
 	if ( evt.keyCode == WYMeditor.KEY.UP
 		|| evt.keyCode == WYMeditor.KEY.DOWN
+		|| evt.keyCode == WYMeditor.KEY.BACKSPACE
 		|| evt.keyCode == WYMeditor.KEY.ENTER ) {
 
 		wym.fixBodyHtml();

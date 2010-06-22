@@ -56,9 +56,9 @@ WYMeditor.WymClassExplorer.prototype.initIframe = function(iframe) {
     this._doc.body.onfocus = function()
         {wym._doc.designMode = "on"; wym._doc = iframe.contentWindow.document;};
     this._doc.onbeforedeactivate = function() {wym.saveCaret();};
+	$(this._doc).bind('keyup', wym.keyup);
     this._doc.onkeyup = function() {
         wym.saveCaret();
-        wym.keyup();
     };
     this._doc.onclick = function() {wym.saveCaret();};
 
@@ -201,8 +201,57 @@ WYMeditor.WymClassExplorer.prototype.unwrap = function() {
 };
 
 //keyup handler
-WYMeditor.WymClassExplorer.prototype.keyup = function() {
+WYMeditor.WymClassExplorer.prototype.keyup = function(evt) {
+    //'this' is the doc
+    var wym = WYMeditor.INSTANCES[this.title];
+
     this._selected_image = null;
+
+    var container = null;
+
+	if( evt.keyCode != WYMeditor.KEY.BACKSPACE
+        && evt.keyCode != WYMeditor.KEY.CTRL
+        && evt.keyCode != WYMeditor.KEY.DELETE
+        && evt.keyCode != WYMeditor.KEY.COMMAND
+        && evt.keyCode != WYMeditor.KEY.UP
+        && evt.keyCode != WYMeditor.KEY.DOWN
+        && evt.keyCode != WYMeditor.KEY.ENTER
+        && !evt.metaKey
+        && !evt.ctrlKey ) {
+
+        //NOT BACKSPACE, NOT DELETE, NOT CTRL, NOT COMMAND
+        //text nodes replaced by P
+
+        container = wym.selected();
+        var name = container.tagName.toLowerCase();
+
+        //fix forbidden main containers
+        if( name == "strong"
+            || name == "b"
+            || name == "em"
+            || name == "i"
+            || name == "sub"
+            || name == "sup"
+            || name == "a" ) {
+
+            name = container.parentNode.tagName.toLowerCase();
+        }
+
+        if( name == WYMeditor.BODY ) {
+            wym._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P);
+			wym.fixBodyHtml();
+        }
+    }
+
+	// If we potentially created a new block level element or moved to a new one
+	// then we should ensure that they're in the proper format
+	if ( evt.keyCode == WYMeditor.KEY.UP
+		|| evt.keyCode == WYMeditor.KEY.DOWN
+		|| evt.keyCode == WYMeditor.KEY.BACKSPACE
+		|| evt.keyCode == WYMeditor.KEY.ENTER ) {
+
+		wym.fixBodyHtml();
+	}
 };
 
 WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node, toStart) {
@@ -213,24 +262,4 @@ WYMeditor.WymClassExplorer.prototype.setFocusToNode = function(node, toStart) {
     range.collapse(toStart);
     range.select();
     node.focus();
-};
-
-/**
- * Need a <br> in front of a table if it's the first block otherwise a user
- * can't insert things in front of the table.
- */
-WYMeditor.WymClassExplorer.prototype.afterInsertTable = function(table) {
-    // Make sure that we still have a bogus node at the begining
-    var $body = $(this._doc).find('body.wym_iframe');
-    var children = $body.children();
-    var placeholder_node = '<br>';
-
-    if(children.length > 0) {
-        var $first_child = $(children[0]);
-        var $last_child = $(children[children.length - 1]);
-
-        if($first_child.is('table')) {
-            $first_child.before(placeholder_node);
-        }
-    }
 };
