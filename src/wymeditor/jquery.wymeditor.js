@@ -913,7 +913,7 @@ WYMeditor.editor.prototype.box = function() {
 WYMeditor.editor.prototype.html = function(html) {
   if( typeof html === 'string' ) {
 	jQuery( this._doc.body ).html( html );
-	this.update();
+	this.fixBodyHtml();
   } else {
 	return jQuery(this._doc.body).html();
   }

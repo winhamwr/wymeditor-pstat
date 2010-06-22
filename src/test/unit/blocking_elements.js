@@ -97,6 +97,11 @@ function runBlockingElementTests() {
 	'double  spaced' +
 	'</pre>';
 
+	// Webkit doesn't use \r\n newlines
+	if( $.browser.webkit || $.browser.safari ) {
+		h1BlockquotePreHtml = h1BlockquotePreHtml.replace(/\r/g, '');
+	}
+
 	// If there is no element in front of a table in FF or ie, it's not possible
 	// to put content in front of that table.
 	test("table has br spacers via .html()", function() {
@@ -334,27 +339,6 @@ function runBlockingElementTests() {
 			equals( children[3].tagName.toLowerCase(), 'br' );
 			equals( children[4].tagName.toLowerCase(), 'pre' );
 			equals( children[5].tagName.toLowerCase(), 'br' );
-		}
-
-		equals( wymeditor.xhtml(), h1BlockquotePreHtml );
-	});
-
-	test("Preformatted text retains spacing", function() {
-		var wymeditor = jQuery.wymeditors(0);
-		wymeditor.html( h1BlockquotePreHtml );
-
-		var $body = $(wymeditor._doc).find('body.wym_iframe');
-		var pre_children = $body.children('pre').contents();
-
-		expect(8);
-		equals( pre_children.length, 6, "Should have text, br, text, br, br, text");
-		if ( pre_children.length == 6 ) {
-			equals( pre_children[0].nodeName.toLowerCase(), '#text' );
-			equals( pre_children[1].nodeName.toLowerCase(), 'br' );
-			equals( pre_children[2].nodeName.toLowerCase(), '#text' );
-			equals( pre_children[3].nodeName.toLowerCase(), 'br' );
-			equals( pre_children[4].nodeName.toLowerCase(), 'br' );
-			equals( pre_children[5].nodeName.toLowerCase(), '#text' );
 		}
 
 		equals( wymeditor.xhtml(), h1BlockquotePreHtml );

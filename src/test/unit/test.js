@@ -146,4 +146,39 @@ function runPostInitTests() {
 			});
 		});
 	}
+
+	module("preformatted text");
+
+	test("Preformatted text retains spacing", function() {
+		var preHtml = '' +
+			'<pre>pre1\r\n' +
+			'spaced\r\n\r\n' +
+			'double  spaced' +
+			'</pre>';
+
+		// Webkit doesn't use \r\n newlines
+		if( $.browser.webkit || $.browser.safari ) {
+			preHtml = preHtml.replace(/\r/g, '');
+		}
+
+		var wymeditor = jQuery.wymeditors(0);
+		wymeditor.html( preHtml );
+
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+		var pre_children = $body.children('pre').contents();
+
+		expect(8);
+		equals( pre_children.length, 6, "Should have text, br, text, br, br, text");
+		if ( pre_children.length == 6 ) {
+			equals( pre_children[0].nodeName.toLowerCase(), '#text' );
+			equals( pre_children[1].nodeName.toLowerCase(), 'br' );
+			equals( pre_children[2].nodeName.toLowerCase(), '#text' );
+			equals( pre_children[3].nodeName.toLowerCase(), 'br' );
+			equals( pre_children[4].nodeName.toLowerCase(), 'br' );
+			equals( pre_children[5].nodeName.toLowerCase(), '#text' );
+		}
+
+		equals( wymeditor.xhtml(), preHtml);
+	});
+
 };

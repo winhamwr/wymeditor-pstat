@@ -163,57 +163,60 @@ WYMeditor.WymClassSafari.prototype.keydown = function(evt) {
 //keyup handler, mainly used for cleanups
 WYMeditor.WymClassSafari.prototype.keyup = function(evt) {
 
-  //'this' is the doc
-  var wym = WYMeditor.INSTANCES[this.title];
+	//'this' is the doc
+	var wym = WYMeditor.INSTANCES[this.title];
 
-  wym._selected_image = null;
-  var container = null;
+	wym._selected_image = null;
+	var container = null;
 
-  if(evt.keyCode == 13 && !evt.shiftKey) {
+	//fix #112
+	if(evt.keyCode == WYMeditor.KEY.ENTER && evt.shiftKey) {
+		wym._exec('InsertLineBreak');
+	}
 
-    //RETURN key
-    //cleanup <br><br> between paragraphs
-    jQuery(wym._doc.body).children(WYMeditor.BR).remove();
+	if(evt.keyCode != WYMeditor.KEY.BACKSPACE
+		&& evt.keyCode != WYMeditor.KEY.CTRL
+		&& evt.keyCode != WYMeditor.KEY.DELETE
+		&& evt.keyCode != WYMeditor.KEY.COMMAND
+        && evt.keyCode != WYMeditor.KEY.UP
+        && evt.keyCode != WYMeditor.KEY.DOWN
+        && evt.keyCode != WYMeditor.KEY.ENTER
+		&& !evt.metaKey
+		&& !evt.ctrlKey) {
 
-    //fix PRE bug #73
-    container = wym.selected();
-    if(container && container.tagName.toLowerCase() == WYMeditor.PRE)
-        wym._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P); //create P after PRE
-  }
+		//NOT BACKSPACE, NOT DELETE, NOT CTRL, NOT COMMAND
+		//text nodes replaced by P
 
-  //fix #112
-  if(evt.keyCode == WYMeditor.KEY.ENTER && evt.shiftKey) {
-    wym._exec('InsertLineBreak');
-  }
+		container = wym.selected();
+		var name = container.tagName.toLowerCase();
 
-  if(evt.keyCode != WYMeditor.KEY.BACKSPACE
-       && evt.keyCode != WYMeditor.KEY.CTRL
-       && evt.keyCode != WYMeditor.KEY.DELETE
-       && evt.keyCode != WYMeditor.KEY.COMMAND
-       && !evt.metaKey
-       && !evt.ctrlKey) {
+		//fix forbidden main containers
+		if( name == "strong"
+			|| name == "b"
+			|| name == "em"
+			|| name == "i"
+			|| name == "sub"
+			|| name == "sup"
+			|| name == "a"
+			|| name == "span" ) { //fix #110
 
-    //NOT BACKSPACE, NOT DELETE, NOT CTRL, NOT COMMAND
-    //text nodes replaced by P
+			name = container.parentNode.tagName.toLowerCase();
+		}
 
-    container = wym.selected();
-    var name = container.tagName.toLowerCase();
+		if( name == WYMeditor.BODY || name == WYMeditor.DIV ) {
+			wym._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P); //fix #110 for DIV
+			wym.fixBodyHtml();
+		}
+	}
 
-    //fix forbidden main containers
-    if(
-      name == "strong" ||
-      name == "b" ||
-      name == "em" ||
-      name == "i" ||
-      name == "sub" ||
-      name == "sup" ||
-      name == "a" ||
-      name == "span" //fix #110
+	// If we potentially created a new block level element or moved to a new one
+	// then we should ensure that they're in the proper format
+	if ( evt.keyCode == WYMeditor.KEY.UP
+		|| evt.keyCode == WYMeditor.KEY.DOWN
+		|| evt.keyCode == WYMeditor.KEY.ENTER ) {
 
-    ) name = container.parentNode.tagName.toLowerCase();
-
-    if(name == WYMeditor.BODY || name == WYMeditor.DIV) wym._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P); //fix #110 for DIV
-  }
+		wym.fixBodyHtml();
+	}
 };
 
 WYMeditor.WymClassSafari.prototype.openBlockTag = function(tag, attributes)
@@ -246,28 +249,4 @@ WYMeditor.WymClassSafari.prototype.getTagForStyle = function(style) {
   if(/sub/.test(style)) return 'sub';
   if(/super/.test(style)) return 'sup';
   return false;
-};
-
-/**
- * Need a <br> at the end of a table if it's the last block, otherwise a user
- * can't insert content after that table.
- */
-WYMeditor.WymClassSafari.prototype.afterInsertTable = function(table) {
-    // Make sure that we still have a bogus node at the end
-    var $body = $(this._doc).find('body.wym_iframe');
-    var children = $body.children();
-    var placeholder_node = '<br>';
-
-    if(children.length > 0) {
-        var $first_child = $(children[0]);
-        var $last_child = $(children[children.length - 1]);
-
-        if($first_child.is('table')) {
-            $first_child.before(placeholder_node);
-        }
-        if($last_child.is('table')) {
-            $last_child.after(placeholder_node);
-        }
-    }
-
 };
