@@ -222,7 +222,9 @@ jQuery.extend(WYMeditor, {
       RIGHT: 39,
       DOWN: 40,
       CURSOR: new Array(37, 38, 39, 40),
-      DELETE: 46
+      DELETE: 46,
+	  CTRL: 17,
+	  COMMAND: 224
     },
 
     NODE : {
@@ -917,6 +919,9 @@ WYMeditor.editor.prototype.html = function(html) {
  * @description Cleans up the HTML
  */
 WYMeditor.editor.prototype.xhtml = function() {
+    // Dirty fix to remove stray line breaks (#189)
+    jQuery(this._doc.body).children(WYMeditor.BR).remove();
+
     return this.parser.parse(this.html());
 };
 
@@ -1158,6 +1163,58 @@ WYMeditor.editor.prototype.update = function() {
     html = this.xhtml();
     jQuery(this._element).val(html);
     jQuery(this._box).find(this._options.htmlValSelector).not('.hasfocus').val(html); //#147
+	this.fixBodyHtml();
+};
+
+/* @name fixBodyHtml
+ * @description Adjust the editor body html to account for editing changes where
+ * perfect HTML is not optimal. For instance, <br> elements are useful between
+ * certain block elements.
+ */
+WYMeditor.editor.prototype.fixBodyHtml = function() {
+    this.fixDoubleBr();
+	this.spaceBlockingElements();
+};
+
+/* @name spaceBlockingElements
+ * @description Insert <br> elements between adjacent blocking elements and
+ * p elements, between block elements or blocking elements and the
+ * start/end of the document.
+ */
+WYMeditor.editor.prototype.spaceBlockingElements = function() {
+	var blocking_selector = 'table, blockquote';
+
+    var $body = $(this._doc).find('body.wym_iframe');
+    var children = $body.children();
+    var placeholder_node = '<br _moz_editor_bogus_node="TRUE" _moz_dirty="">';
+
+	// Make sure that we still have a bogus node at both the begining and end
+    if(children.length > 0) {
+        var $first_child = $(children[0]);
+        var $last_child = $(children[children.length - 1]);
+
+        if($first_child.is(blocking_selector)) {
+            $first_child.before(placeholder_node);
+        }
+        if($last_child.is(blocking_selector)) {
+            $last_child.after(placeholder_node);
+        }
+    }
+
+	// Put placeholder nodes between consecutive blocking elements
+	var block_sel = 'table + table, blockquote + table, ' +
+	    'table + blockquote, blockquote + blockquote, ' +
+		'p + table, table + p, p + blockquote, blockquote + p';
+	$body.find(block_sel).before(placeholder_node);
+};
+
+/* @name fixDoubleBr
+ * @description Remove the <br><br> elements that are inserted between
+ * paragraphs, usually after hitting enter from an existing paragraph.
+ */
+WYMeditor.editor.prototype.fixDoubleBr = function() {
+    var $body = $(this._doc).find('body.wym_iframe');
+	$body.find('br + br').remove();
 };
 
 /* @name dialog
@@ -1346,24 +1403,11 @@ WYMeditor.editor.prototype.insertTable = function(rows, columns, caption, summar
 	if(!node || !node.parentNode) jQuery(this._doc.body).append(table);
 	else jQuery(node).after(table);
 
-	this.separateConsecutiveTables();
 	this.afterInsertTable(table);
+	this.fixBodyHtml();
 
 	return table;
   }
-};
-
-/**
- * Ensure that any consecutive tables have a placeholder <br> between them so
- * that it is possible to place content between them.
- */
-WYMeditor.editor.prototype.separateConsecutiveTables = function() {
-  var $body = $(this._doc).find('body.wym_iframe');
-  var placeholder_node = '<br>';
-
-  $body.find('table + table').each(function (index, table) {
-	$(table).before(placeholder_node);
-  });
 };
 
 /**

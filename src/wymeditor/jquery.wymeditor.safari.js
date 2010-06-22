@@ -182,14 +182,14 @@ WYMeditor.WymClassSafari.prototype.keyup = function(evt) {
   }
 
   //fix #112
-  if(evt.keyCode == 13 && evt.shiftKey) {
+  if(evt.keyCode == WYMeditor.KEY.ENTER && evt.shiftKey) {
     wym._exec('InsertLineBreak');
   }
 
-  if(evt.keyCode != 8
-       && evt.keyCode != 17
-       && evt.keyCode != 46
-       && evt.keyCode != 224
+  if(evt.keyCode != WYMeditor.KEY.BACKSPACE
+       && evt.keyCode != WYMeditor.KEY.CTRL
+       && evt.keyCode != WYMeditor.KEY.DELETE
+       && evt.keyCode != WYMeditor.KEY.COMMAND
        && !evt.metaKey
        && !evt.ctrlKey) {
 

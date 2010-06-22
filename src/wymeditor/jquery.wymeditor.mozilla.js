@@ -198,46 +198,41 @@ WYMeditor.WymClassMozilla.prototype.keydown = function(evt) {
 //keyup handler, mainly used for cleanups
 WYMeditor.WymClassMozilla.prototype.keyup = function(evt) {
 
-  //'this' is the doc
-  var wym = WYMeditor.INSTANCES[this.title];
+    //'this' is the doc
+    var wym = WYMeditor.INSTANCES[this.title];
 
-  wym._selected_image = null;
-  var container = null;
+    wym._selected_image = null;
+    var container = null;
 
-  if(evt.keyCode == 13 && !evt.shiftKey) {
+    if( evt.keyCode != WYMeditor.KEY.BACKSPACE
+        && evt.keyCode != WYMeditor.KEY.CTRL
+        && evt.keyCode != WYMeditor.KEY.DELETE
+        && evt.keyCode != WYMeditor.KEY.COMMAND
+        && !evt.metaKey
+        && !evt.ctrlKey ) {
 
-    //RETURN key
-    //cleanup <br><br> between paragraphs
-    jQuery(wym._doc.body).children(WYMeditor.BR).remove();
-  }
+        //NOT BACKSPACE, NOT DELETE, NOT CTRL, NOT COMMAND
+        //text nodes replaced by P
 
-  if(evt.keyCode != 8
-       && evt.keyCode != 17
-       && evt.keyCode != 46
-       && evt.keyCode != 224
-       && !evt.metaKey
-       && !evt.ctrlKey) {
+        container = wym.selected();
+        var name = container.tagName.toLowerCase();
 
-    //NOT BACKSPACE, NOT DELETE, NOT CTRL, NOT COMMAND
-    //text nodes replaced by P
+        //fix forbidden main containers
+        if( name == "strong"
+            || name == "b"
+            || name == "em"
+            || name == "i"
+            || name == "sub"
+            || name == "sup"
+            || name == "a" ) {
 
-    container = wym.selected();
-    var name = container.tagName.toLowerCase();
+            name = container.parentNode.tagName.toLowerCase();
+        }
 
-    //fix forbidden main containers
-    if(
-      name == "strong" ||
-      name == "b" ||
-      name == "em" ||
-      name == "i" ||
-      name == "sub" ||
-      name == "sup" ||
-      name == "a"
-
-    ) name = container.parentNode.tagName.toLowerCase();
-
-    if(name == WYMeditor.BODY) wym._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P);
-  }
+        if( name == WYMeditor.BODY ) {
+            wym._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P);
+        }
+    }
 };
 
 WYMeditor.WymClassMozilla.prototype.enableDesignMode = function() {
@@ -289,23 +284,13 @@ WYMeditor.WymClassMozilla.prototype.afterInsertTable = function(table) {
             $(element).append('<br _moz_dirty="">');
         });
     }
-
-    // Make sure that we still have a bogus node at both the begining and end
-    var $body = $(this._doc).find('body.wym_iframe');
-    var children = $body.children();
-    var placeholder_node = '<br _moz_editor_bogus_node="TRUE" _moz_dirty="">';
-
-    if(children.length > 0) {
-        var $first_child = $(children[0]);
-        var $last_child = $(children[children.length - 1]);
-
-        if($first_child.is('table')) {
-            $first_child.before(placeholder_node);
-        }
-        if($last_child.is('table')) {
-            $last_child.after(placeholder_node);
-        }
-    }
-
 };
 
+/* @name fixDoubleBr
+ * @description Remove the <br><br> elements that are inserted between
+ * paragraphs, usually after hitting enter from an existing paragraph.
+ */
+WYMeditor.editor.prototype.fixDoubleBr = function() {
+    var $body = $(this._doc).find('body.wym_iframe');
+	$body.find('br + br').remove();
+};
