@@ -95,7 +95,6 @@ function runBlockingElementTests() {
 	test("table has br spacers via .html()", function() {
 		var wymeditor = jQuery.wymeditors(0);
 		wymeditor.html(tableHtml);
-		wymeditor.fixBodyHtml();
 
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
 		var children = $body.children();
@@ -151,7 +150,6 @@ function runBlockingElementTests() {
 	test("p + table has br spacers via .html()", function() {
 		var wymeditor = jQuery.wymeditors(0);
 		wymeditor.html(pTableHtml);
-		wymeditor.fixBodyHtml();
 
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
 		var children = $body.children();
@@ -217,7 +215,6 @@ function runBlockingElementTests() {
 	test("p + table + p has br spacers via .html()", function() {
 		var wymeditor = jQuery.wymeditors(0);
 		wymeditor.html(pTablePHtml);
-		wymeditor.fixBodyHtml();
 
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
 		var children = $body.children();
@@ -265,7 +262,6 @@ function runBlockingElementTests() {
 	test("p + table + table + p has br spacers via .html()", function() {
 		var wymeditor = jQuery.wymeditors(0);
 		wymeditor.html(pTableTablePHtml);
-		wymeditor.fixBodyHtml();
 
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
 		var children = $body.children();
@@ -320,7 +316,6 @@ function runBlockingElementTests() {
 		// focus
 		var wymeditor = jQuery.wymeditors(0);
 		wymeditor.html(pTablePHtml);
-		wymeditor.fixBodyHtml();
 
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
 
@@ -338,14 +333,8 @@ function runBlockingElementTests() {
 
 		// Go through each top-level element and hit the DOWN key
 		$body.children().each( function (index, element) {
-			// Simulate a keyup event
-			var event = $.Event('keyup');
-			event.keyCode = 40; //DOWN
-			event.metaKey = false;
-			event.ctrlKey = false;
-
 			moveSelector(wymeditor, element);
-			$(wymeditor._doc).trigger(event);
+			simulateKey( 40, wymeditor._doc ); // Send DOWN
 
 			checkLayout($body);
 
@@ -364,7 +353,7 @@ function runBlockingElementTests() {
 				sel.removeAllRanges();
 				sel.addRange( range );
 
-				$(wymeditor._doc).trigger(event);
+				simulateKey( 40, wymeditor._doc ); // Send DOWN
 			}
 
 			checkLayout($body);
@@ -378,15 +367,71 @@ function runBlockingElementTests() {
 		$body.children().each( function (index, element) {
 			moveSelector(wymeditor, element);
 
-			// Simulate and send the keyup event
-			var event = $.Event('keyup');
-			event.keyCode = 38; //UP
-			event.metaKey = false;
-			event.ctrlKey = false;
-			$(wymeditor._doc).trigger(event);
+			simulateKey( 38, wymeditor._doc ); // Send UP
 
 			checkLayout($body);
 		});
+	});
+
+	test("br spacers don't cause lots of blank p's when arrowing down", function() {
+		var wymeditor = jQuery.wymeditors(0);
+		wymeditor.html(pTableHtml);
+
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		// Move the selector to the br before the table
+		var sel = wymeditor._iframe.contentWindow.getSelection();
+		var range = wymeditor._doc.createRange();
+		range.setStart( $body[0], 1 );
+		range.setEnd( $body[0], 1 );
+
+		sel.removeAllRanges();
+		sel.addRange( range );
+
+		simulateKey( 38, wymeditor._doc ); // DOWN key
+
+		var children = $body.children();
+
+		equals( children.length, 4 , "Should have p, br, table, br");
+		if ( children.length == 4 ) {
+			equals( children[0].tagName.toLowerCase(), 'p' );
+			equals( children[1].tagName.toLowerCase(), 'br' );
+			equals( children[2].tagName.toLowerCase(), 'table' );
+			equals( children[3].tagName.toLowerCase(), 'br' );
+		}
+
+		equals( wymeditor.xhtml(), pTableHtml );
+	});
+
+	test("br spacers don't cause lots of blank p's when arrowing up", function() {
+		var wymeditor = jQuery.wymeditors(0);
+		wymeditor.html(pTablePHtml);
+
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		// Move the selector to the br after the table
+		var sel = wymeditor._iframe.contentWindow.getSelection();
+		var range = wymeditor._doc.createRange();
+		range.setStart( $body[0], 3 );
+		range.setEnd( $body[0], 3 );
+
+		sel.removeAllRanges();
+		sel.addRange( range );
+
+		simulateKey( 40, wymeditor._doc ); // UP key
+
+		var children = $body.children();
+
+		equals( children.length, 5 , "Should have p, br, table, br, p");
+		if ( children.length == 5 ) {
+			equals( children[0].tagName.toLowerCase(), 'p' );
+			equals( children[1].tagName.toLowerCase(), 'br' );
+			equals( children[2].tagName.toLowerCase(), 'table' );
+			equals( children[3].tagName.toLowerCase(), 'br' );
+			equals( children[4].tagName.toLowerCase(), 'p' );
+		}
+
+		equals( wymeditor.xhtml(), pTablePHtml );
 	});
 
 	test("br spacers stay in place when content is inserted- post-br", function() {
@@ -394,7 +439,6 @@ function runBlockingElementTests() {
 		// shouldn't keep the br after that paragraph
 		var wymeditor = jQuery.wymeditors(0);
 		wymeditor.html(tableHtml);
-		wymeditor.fixBodyHtml();
 
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
 
@@ -420,7 +464,7 @@ function runBlockingElementTests() {
 			equals( children[3].tagName.toLowerCase(), 'p' );
 		}
 
-		equals( wymeditor.xhtml(), tableHtml );
+		equals( wymeditor.xhtml(), tableHtml + '<p>yo</p>');
 	});
 
 	test("br spacers stay in place when content is inserted- pre-br", function() {
@@ -429,7 +473,6 @@ function runBlockingElementTests() {
 		// content.
 		var wymeditor = jQuery.wymeditors(0);
 		wymeditor.html(tableHtml);
-		wymeditor.fixBodyHtml();
 
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
 

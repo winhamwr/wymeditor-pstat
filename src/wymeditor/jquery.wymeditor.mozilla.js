@@ -95,6 +95,7 @@ WYMeditor.WymClassMozilla.prototype.html = function(html) {
 
     //update the html body
     jQuery(this._doc.body).html(html);
+	this._wym.fixBodyHtml();
 
     //re-init designMode
     this.enableDesignMode();
@@ -208,6 +209,9 @@ WYMeditor.WymClassMozilla.prototype.keyup = function(evt) {
         && evt.keyCode != WYMeditor.KEY.CTRL
         && evt.keyCode != WYMeditor.KEY.DELETE
         && evt.keyCode != WYMeditor.KEY.COMMAND
+        && evt.keyCode != WYMeditor.KEY.UP
+        && evt.keyCode != WYMeditor.KEY.DOWN
+        && evt.keyCode != WYMeditor.KEY.ENTER
         && !evt.metaKey
         && !evt.ctrlKey ) {
 
@@ -231,8 +235,18 @@ WYMeditor.WymClassMozilla.prototype.keyup = function(evt) {
 
         if( name == WYMeditor.BODY ) {
             wym._exec(WYMeditor.FORMAT_BLOCK, WYMeditor.P);
+			wym.fixBodyHtml();
         }
     }
+
+	// If we potentially created a new block level element or moved to a new one
+	// then we should ensure that they're in the proper format
+	if ( evt.keyCode == WYMeditor.KEY.UP
+		|| evt.keyCode == WYMeditor.KEY.DOWN
+		|| evt.keyCode == WYMeditor.KEY.ENTER ) {
+
+		wym.fixBodyHtml();
+	}
 };
 
 WYMeditor.WymClassMozilla.prototype.enableDesignMode = function() {
@@ -284,13 +298,4 @@ WYMeditor.WymClassMozilla.prototype.afterInsertTable = function(table) {
             $(element).append('<br _moz_dirty="">');
         });
     }
-};
-
-/* @name fixDoubleBr
- * @description Remove the <br><br> elements that are inserted between
- * paragraphs, usually after hitting enter from an existing paragraph.
- */
-WYMeditor.editor.prototype.fixDoubleBr = function() {
-    var $body = $(this._doc).find('body.wym_iframe');
-	$body.find('br + br').remove();
 };

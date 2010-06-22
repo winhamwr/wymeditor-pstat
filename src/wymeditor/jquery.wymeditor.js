@@ -1215,6 +1215,17 @@ WYMeditor.editor.prototype.spaceBlockingElements = function() {
 WYMeditor.editor.prototype.fixDoubleBr = function() {
     var $body = $(this._doc).find('body.wym_iframe');
 	$body.find('br + br').remove();
+
+	// Also remove any brs between two p's
+	$body.find('p + br').next('p').prev('br').remove();
+
+	// Remove brs floating at the end after a p
+	var $last_br = $body.find('p + br').slice(-1);
+	if ( $last_br.length > 0 ) {
+	  if ( $last_br.next().length == 0 ) {
+		$last_br.remove();
+	  }
+	}
 };
 
 /* @name dialog
