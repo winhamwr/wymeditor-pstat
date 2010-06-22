@@ -898,16 +898,19 @@ WYMeditor.editor.prototype.ready = function() {
  * @description Returns the WYMeditor container
  */
 WYMeditor.editor.prototype.box = function() {
-  return(this._box);
+  return this._box;
 };
 
 /* @name html
  * @description Get/Set the html value
  */
 WYMeditor.editor.prototype.html = function(html) {
-
-  if(typeof html === 'string') jQuery(this._doc.body).html(html);
-  else return(jQuery(this._doc.body).html());
+  if( typeof html === 'string' ) {
+	jQuery( this._doc.body ).html( html );
+	this.update();
+  } else {
+	return jQuery(this._doc.body).html();
+  }
 };
 
 /* @name xhtml
