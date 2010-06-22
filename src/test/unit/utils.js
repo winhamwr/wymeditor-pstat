@@ -16,6 +16,36 @@ function moveSelector( wymeditor, selectedElement ) {
 	sel.addRange( range );
 }
 
+/*
+ * Simulate a keypress, firing off the keydown, keypress and keyup events.
+ */
+function simulateKey( keyCode, targetElement ) {
+	var keydown = $.Event('keydown');
+	keydown.keyCode = keyCode;
+	keydown.metaKey = false;
+	keydown.ctrlKey = false;
+	keydown.shiftKey = false;
+	keydown.altKey = false;
+
+	var keypress = $.Event('keypress');
+	keypress.keyCode = keyCode;
+	keypress.metaKey = false;
+	keypress.ctrlKey = false;
+	keypress.shiftKey = false;
+	keypress.altKey = false;
+
+	var keyup = $.Event('keyup');
+	keyup.keyCode = keyCode;
+	keyup.metaKey = false;
+	keyup.ctrlKey = false;
+	keyup.shiftKey = false;
+	keyup.altKey = false;
+
+	$(targetElement).trigger(keydown);
+	$(targetElement).trigger(keypress);
+	$(targetElement).trigger(keyup);
+}
+
 /**
 * Determine if this element is editable.
 * Mimics https://developer.mozilla.org/en/DOM/element.isContentEditable

@@ -389,27 +389,66 @@ function runBlockingElementTests() {
 		});
 	});
 
-	test("br spacers stay in place when content is inserted", function() {
+	test("br spacers stay in place when content is inserted- post-br", function() {
+		// A new paragraph after a table should keep a br after the table and
+		// shouldn't keep the br after that paragraph
+		var wymeditor = jQuery.wymeditors(0);
+		wymeditor.html(tableHtml);
+		wymeditor.fixBodyHtml();
+
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		// Move the selector to the 2nd br (index 2)
+		var sel = wymeditor._iframe.contentWindow.getSelection();
+		var range = wymeditor._doc.createRange();
+		range.setStart( $body[0], 2 );
+		range.setEnd( $body[0], 2 );
+
+		// Insert a paragraph after the table
+		$body.children('table').after('<p>yo</p>');
+
+		// Simulate and send the keystroke event to trigger fixing the dom
+		simulateKey( 40, wymeditor._doc ); // DOWN key
+
+		var children = $body.children();
+
+		equals( children.length, 4, "Should have br, table, br, p");
+		if ( children.length == 4 ) {
+			equals( children[0].tagName.toLowerCase(), 'br' );
+			equals( children[1].tagName.toLowerCase(), 'table' );
+			equals( children[2].tagName.toLowerCase(), 'br' );
+			equals( children[3].tagName.toLowerCase(), 'p' );
+		}
+
+		equals( wymeditor.xhtml(), tableHtml );
+	});
+
+	test("br spacers stay in place when content is inserted- pre-br", function() {
 		// A br should remain in necessary spots even after content is inserted
 		// there. Duplicate brs should also not be created when inserting that
 		// content.
 		var wymeditor = jQuery.wymeditors(0);
-		wymeditor.html(pTablePHtml);
+		wymeditor.html(tableHtml);
 		wymeditor.fixBodyHtml();
 
 		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		// Move the selector to the start
+		moveSelector(wymeditor, $body[0]);
+
+		// Simulate and send the keyup event
+		simulateKey( 65, wymeditor._doc ); // `a` key
+
 		var children = $body.children();
 
-		expect(7);
-		equals( children.length, 5 );
-		if ( children.length == 5 ) {
+		equals( children.length, 4 , "Should have p, br, table, br");
+		if ( children.length == 4 ) {
 			equals( children[0].tagName.toLowerCase(), 'p' );
 			equals( children[1].tagName.toLowerCase(), 'br' );
 			equals( children[2].tagName.toLowerCase(), 'table' );
 			equals( children[3].tagName.toLowerCase(), 'br' );
-			equals( children[4].tagName.toLowerCase(), 'p' );
 		}
 
-		equals( wymeditor.xhtml(), pTablePHtml );
+		equals( wymeditor.xhtml(), tableHtml );
 	});
 }
