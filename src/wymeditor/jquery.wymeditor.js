@@ -212,6 +212,11 @@ jQuery.extend(WYMeditor, {
 	   "noscript", "ol", "p", "pre", "table", "ul", "dd", "dt",
 	   "li", "tbody", "td", "tfoot", "th", "thead", "tr"),
 
+	BLOCKING_ELEMENTS : new Array("table", "blockquote"),
+
+	NON_BLOCKING_ELEMENTS : new Array("p", "h1", "h2", "h3", "h4", "h5", "h6",
+		"pre"),
+
     KEY : {
       BACKSPACE: 8,
       ENTER: 13,
@@ -1182,7 +1187,7 @@ WYMeditor.editor.prototype.fixBodyHtml = function() {
  * start/end of the document.
  */
 WYMeditor.editor.prototype.spaceBlockingElements = function() {
-	var blocking_selector = 'table, blockquote';
+	var blocking_selector = WYMeditor.BLOCKING_ELEMENTS.join(', ');
 
     var $body = $(this._doc).find('body.wym_iframe');
     var children = $body.children();
@@ -1201,11 +1206,39 @@ WYMeditor.editor.prototype.spaceBlockingElements = function() {
         }
     }
 
-	// Put placeholder nodes between consecutive blocking elements
-	var block_sel = 'table + table, blockquote + table, ' +
-	    'table + blockquote, blockquote + blockquote, ' +
-		'p + table, table + p, p + blockquote, blockquote + p';
-	$body.find(block_sel).before(placeholder_node);
+	if ( typeof( this._block_spacers_sel ) == 'undefined' ) {
+		this._buildBlockSepSelector();
+	}
+
+	// Put placeholder nodes between consecutive blocking elements and between
+	// blocking elements and normal block-level elements
+	$body.find( this._block_spacers_sel ).before( placeholder_node );
+};
+
+/* @name _buildBlockSepSelector
+ * @description Build a string representing a jquery selector that will find all
+ * elements which need a spacer <br> before them. This includes all consecutive
+ * blocking elements and between blocking elements and normal non-blocking
+ * elements.
+ */
+WYMeditor.editor.prototype._buildBlockSepSelector = function() {
+	var block_combo = new Array();
+	// Consecutive blocking elements need separators
+	$.each(WYMeditor.BLOCKING_ELEMENTS, function(index_o, element_o) {
+		$.each(WYMeditor.BLOCKING_ELEMENTS, function(index_i, element_i) {
+		    block_combo.push( element_o + ' + ' + element_i );
+		});
+	});
+
+	// A blocking element either followed by or preceeded by a block elements
+	// needs separators
+	$.each(WYMeditor.BLOCKING_ELEMENTS, function(index_o, element_o) {
+		$.each(WYMeditor.NON_BLOCKING_ELEMENTS, function(index_i, element_i) {
+		    block_combo.push( element_o + ' + ' + element_i );
+		    block_combo.push( element_i + ' + ' + element_o );
+		});
+	});
+	this._block_spacers_sel = block_combo.join(', ');
 };
 
 /* @name fixDoubleBr
