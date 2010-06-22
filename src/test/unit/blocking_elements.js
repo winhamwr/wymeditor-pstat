@@ -92,7 +92,7 @@ function runBlockingElementTests() {
 	var h1BlockquotePreHtml = '' +
 	'<h1>h1</h1>' +
 	'<blockquote>bq1</blockquote>' +
-	'<pre>pre1</pre>';
+	'<pre>pre1<br />spaced<br /><br />double spaced</pre>';
 
 	// If there is no element in front of a table in FF or ie, it's not possible
 	// to put content in front of that table.
@@ -323,18 +323,37 @@ function runBlockingElementTests() {
 		var children = $body.children();
 
 		expect(7);
-		equals( children.length, 5 );
-		if ( children.length == 5 ) {
+		equals( children.length, 6 );
+		if ( children.length == 6 ) {
 			equals( children[0].tagName.toLowerCase(), 'h1' );
 			equals( children[1].tagName.toLowerCase(), 'br' );
 			equals( children[2].tagName.toLowerCase(), 'blockquote' );
 			equals( children[3].tagName.toLowerCase(), 'br' );
 			equals( children[4].tagName.toLowerCase(), 'pre' );
+			equals( children[5].tagName.toLowerCase(), 'br' );
+		}
+	});
+
+	test("Preformatted text doesn't have brs stripped", function() {
+		var wymeditor = jQuery.wymeditors(0);
+		wymeditor.html( h1BlockquotePreHtml );
+
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+		var pre_children = $body.children('pre').contents();
+
+		expect(8);
+		equals( pre_children.length, 6, "Should have text, br, text, br, br, text");
+		if ( pre_children.length == 6 ) {
+			equals( pre_children[0].nodeName.toLowerCase(), '#text' );
+			equals( pre_children[1].nodeName.toLowerCase(), 'br' );
+			equals( pre_children[2].nodeName.toLowerCase(), '#text' );
+			equals( pre_children[3].nodeName.toLowerCase(), 'br' );
+			equals( pre_children[4].nodeName.toLowerCase(), 'br' );
+			equals( pre_children[5].nodeName.toLowerCase(), '#text' );
 		}
 
 		equals( wymeditor.xhtml(), h1BlockquotePreHtml );
 	});
-
 
 	test("br spacers aren't deleted when arrowing through them", function() {
 		// the spacer <br> shouldn't be turned in to a <p> when it gets cursor

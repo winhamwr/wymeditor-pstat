@@ -184,16 +184,6 @@ WYMeditor.WymClassMozilla.prototype.keydown = function(evt) {
     }
   }
 
-  else if(evt.keyCode == 13) {
-    if(!evt.shiftKey){
-      //fix PRE bug #73
-      container = wym.selected();
-      if(container && container.tagName.toLowerCase() == WYMeditor.PRE) {
-        evt.preventDefault();
-        wym.insert('<p></p>');
-      }
-    }
-  }
 };
 
 //keyup handler, mainly used for cleanups

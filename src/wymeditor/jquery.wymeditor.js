@@ -212,10 +212,9 @@ jQuery.extend(WYMeditor, {
 	   "noscript", "ol", "p", "pre", "table", "ul", "dd", "dt",
 	   "li", "tbody", "td", "tfoot", "th", "thead", "tr"),
 
-	BLOCKING_ELEMENTS : new Array("table", "blockquote"),
+	BLOCKING_ELEMENTS : new Array("table", "blockquote", "pre"),
 
-	NON_BLOCKING_ELEMENTS : new Array("p", "h1", "h2", "h3", "h4", "h5", "h6",
-		"pre"),
+	NON_BLOCKING_ELEMENTS : new Array("p", "h1", "h2", "h3", "h4", "h5", "h6"),
 
     KEY : {
       BACKSPACE: 8,
@@ -1247,7 +1246,8 @@ WYMeditor.editor.prototype._buildBlockSepSelector = function() {
  */
 WYMeditor.editor.prototype.fixDoubleBr = function() {
     var $body = $(this._doc).find('body.wym_iframe');
-	$body.find('br + br').remove();
+	// Strip consecutive brs unless they're in a a pre tag
+	$body.find('br + br').filter(':not(pre br)').remove();
 
 	// Also remove any brs between two p's
 	$body.find('p + br').next('p').prev('br').remove();
