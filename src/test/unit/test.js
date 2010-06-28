@@ -181,4 +181,20 @@ function runPostInitTests() {
 		equals( wymeditor.xhtml(), preHtml);
 	});
 
+	module("soft return");
+
+	test("Double soft returns are allowed", function() {
+		var initHtml = '' +
+			'<ul>' +
+				'<li>li_1<br /><br />stuff</li>' +
+			'</ul>';
+
+		var wymeditor = jQuery.wymeditors(0);
+		wymeditor.html( initHtml );
+
+		wymeditor.fixBodyHtml();
+
+		expect(1);
+		equals( wymeditor.xhtml(), initHtml);
+	});
 };

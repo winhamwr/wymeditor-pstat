@@ -219,15 +219,17 @@ jQuery.extend(WYMeditor, {
     KEY : {
       BACKSPACE: 8,
       ENTER: 13,
+	  CTRL: 17,
       END: 35,
       HOME: 36,
+      CURSOR: new Array(37, 38, 39, 40),
       LEFT: 37,
       UP: 38,
       RIGHT: 39,
       DOWN: 40,
-      CURSOR: new Array(37, 38, 39, 40),
       DELETE: 46,
-	  CTRL: 17,
+	  B: 66,
+	  I: 73,
 	  COMMAND: 224
     },
 
@@ -1247,7 +1249,7 @@ WYMeditor.editor.prototype._buildBlockSepSelector = function() {
 WYMeditor.editor.prototype.fixDoubleBr = function() {
     var $body = $(this._doc).find('body.wym_iframe');
 	// Strip consecutive brs unless they're in a a pre tag
-	$body.find('br + br').filter(':not(pre br)').remove();
+	$body.children('br + br').filter(':not(pre br)').remove();
 
 	// Also remove any brs between two p's
 	$body.find('p + br').next('p').prev('br').remove();

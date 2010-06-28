@@ -19,27 +19,36 @@ function moveSelector( wymeditor, selectedElement ) {
 /*
  * Simulate a keypress, firing off the keydown, keypress and keyup events.
  */
-function simulateKey( keyCode, targetElement ) {
+function simulateKey( keyCode, targetElement, options) {
+	var defaults = {
+		'metaKey': false,
+		'ctrlKey': false,
+		'shiftKey': false,
+		'altKey': false
+	};
+
+	var options = $.extend(defaults, options);
+
 	var keydown = $.Event('keydown');
 	keydown.keyCode = keyCode;
-	keydown.metaKey = false;
-	keydown.ctrlKey = false;
-	keydown.shiftKey = false;
-	keydown.altKey = false;
+	keydown.metaKey = options.metaKey;
+	keydown.ctrlKey = options.ctrlKey;
+	keydown.shiftKey = options.shiftKey;
+	keydown.altKey = options.altKey;
 
 	var keypress = $.Event('keypress');
 	keypress.keyCode = keyCode;
-	keypress.metaKey = false;
-	keypress.ctrlKey = false;
-	keypress.shiftKey = false;
-	keypress.altKey = false;
+	keydown.metaKey = options.metaKey;
+	keydown.ctrlKey = options.ctrlKey;
+	keydown.shiftKey = options.shiftKey;
+	keydown.altKey = options.altKey;
 
 	var keyup = $.Event('keyup');
 	keyup.keyCode = keyCode;
-	keyup.metaKey = false;
-	keyup.ctrlKey = false;
-	keyup.shiftKey = false;
-	keyup.altKey = false;
+	keydown.metaKey = options.metaKey;
+	keydown.ctrlKey = options.ctrlKey;
+	keydown.shiftKey = options.shiftKey;
+	keydown.altKey = options.altKey;
 
 	$(targetElement).trigger(keydown);
 	$(targetElement).trigger(keypress);
