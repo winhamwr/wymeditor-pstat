@@ -8,6 +8,7 @@
 
 WYMeditor.editor.prototype.table = function(options) {
 	var table_editor = new TableEditor(options, this);
+	this.table_editor = table_editor;
 
 	return(table_editor);
 };
@@ -26,5 +27,29 @@ TableEditor.prototype.init = function() {
 };
 
 TableEditor.prototype.keyup = function(evt) {
-	alert('keyup');
+	//'this' is the doc
+	var wym = WYMeditor.INSTANCES[this.title];
+	var table_editor = wym.table_editor;
+
+	if( evt.altKey && evt.keyCode == WYMeditor.KEY.R ) {
+		alert('alt + r pressed');
+		table_editor.addRow(wym.selected());
+	}
+};
+
+/*
+ * Add a row to the given elmnt (representing a <tr> or a child of a <tr>).
+ */
+TableEditor.prototype.addRow = function(elmnt) {
+	var wym = this._wym;
+	var tr = wym.findUp(elmnt, 'tr');
+
+	// Find out how many td elements in this tr
+	var td_children = $(tr).children('td');
+
+	var td_html = '';
+	for(i=0;i<td_children.length;i++) {
+		td_html += '<td>&nbsp;</td>';
+	}
+	$(tr).after('<tr>'+td_html+'</tr>');
 };

@@ -230,6 +230,7 @@ jQuery.extend(WYMeditor, {
       DELETE: 46,
 	  B: 66,
 	  I: 73,
+	  R: 82,
 	  COMMAND: 224
     },
 
