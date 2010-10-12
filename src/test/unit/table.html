@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+ * WYMeditor : what you see is What You Mean web-based editor
+ * Copyright (c) 2005 - 2009 Jean-Francois Hovinne, http://www.wymeditor.org/
+ * Dual licensed under the MIT (MIT-license.txt)
+ * and GPL (GPL-license.txt) licenses.
+ *
+ * For further information visit:
+ *        http://www.wymeditor.org/
+ *
+ * File Name:
+ *        test.html
+ *        WYMeditor unit tests.
+ *        See the documentation for more info.
+ *
+ * File Authors:
+ *        Jean-Francois Hovinne (jf.hovinne a-t wymeditor dotorg)
+ *        Wes Winham
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>WYMeditor Table Plugin Test Suite</title>
+<link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<!-- <script type="text/javascript" src="../../jquery/jquery.js"></script> -->
+<script type="text/javascript" src="../../wymeditor/jquery.wymeditor.js"></script>
+<script type="text/javascript" src="../../wymeditor/jquery.wymeditor.explorer.js"></script>
+<script type="text/javascript" src="../../wymeditor/jquery.wymeditor.mozilla.js"></script>
+<script type="text/javascript" src="../../wymeditor/jquery.wymeditor.opera.js"></script>
+<script type="text/javascript" src="../../wymeditor/jquery.wymeditor.safari.js"></script>
+<script type="text/javascript" src="../../wymeditor/plugins/table/jquery.wymeditor.table.js"></script>
+<script type="text/javascript" src="qunit.js"></script>
+
+<script type="text/javascript" src="utils.js"></script>
+
+<script type="text/javascript" src="table_test.js"></script>
+
+</head>
+
+<body>
+	<h1 id="qunit-header">WYMeditor Table Plugin Test Suite</h1>
+	<h2 id="qunit-banner"></h2>
+	<h2 id="qunit-userAgent"></h2>
+	<div>
+	<form method="post" action="">
+		<textarea class="wymeditor"></textarea>
+		<input type="submit" class="wymupdate" />
+		<input type="button" class="wymclear" name="Clear" value="Clear" />
+	</form>
+	</div>
+	<ol id="qunit-tests"></ol>
+</body>
+</html>
