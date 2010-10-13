@@ -1,5 +1,11 @@
 function htmlEquals( wymeditor, expected ) {
-	equals( jQuery.trim( wymeditor.xhtml() ), jQuery.trim( expected ) );
+	var trimmed = jQuery.trim( wymeditor.xhtml() );
+	// This is a super-naive regex to turn things like:
+	//    <html>   </html> => <html></html>
+	// It fails for cases where white space is actually significant like:
+	//    <strong>foo</strong> <em>bar</em>
+	var minned = trimmed.replace(/\>\s+\</g, '><');
+	equals( minned, jQuery.trim( expected ) );
 }
 
 /**
