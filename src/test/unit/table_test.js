@@ -183,16 +183,17 @@ function runPostInitTests() {
 	});
 
 	test("Add/Remove Column mid column", function() {
-		expect(1);
+		expect(2);
 
 		testTable( '#td_3_2', 'add', 'column', basicTableHtml, addColumnTd32Html );
-		testTable( '#td_3_2', 'remove', 'column', addColumnTd32Html, basicTableHtml );
+		testTable( '#td_3_2 + td', 'remove', 'column', addColumnTd32Html, basicTableHtml );
 	});
 
 	test("Add/Remove Column from span", function() {
-		expect(1);
+		expect(2);
 
 		testTable( '#span_2_1', 'add', 'column', basicTableHtml, addColumnSpan21Html );
+		testTable( '#td_2_1 + td', 'remove', 'column', addColumnSpan21Html, basicTableHtml );
 	});
 
 	test("Add/Remove Row end row", function() {

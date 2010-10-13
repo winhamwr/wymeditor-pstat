@@ -130,6 +130,18 @@ TableEditor.prototype.removeRow = function(elmnt) {
 	*/
 TableEditor.prototype.addColumn = function(elmnt) {
 	var wym = this._wym;
+	var td = wym.findUp(elmnt, 'td');
+	if ( td == null ) {
+		return false;
+	}
+	var prevTds = $(td).prevAll();
+	var tdIndex = prevTds.length;
+
+	var tr = wym.findUp(td, 'tr');
+	$(tr).siblings('tr').each( function(index, element) {
+		$(element).find('td:eq('+tdIndex+')').after('<td>&nbsp;</td>');
+	});
+	$(td).after('<td>&nbsp;</td>');
 
 	return false;
 };
@@ -140,6 +152,18 @@ TableEditor.prototype.addColumn = function(elmnt) {
 	*/
 TableEditor.prototype.removeColumn = function(elmnt) {
 	var wym = this._wym;
+	var td = wym.findUp(elmnt, 'td');
+	if ( td == null ) {
+		return false;
+	}
+	var prevTds = $(td).prevAll();
+	var tdIndex = prevTds.length;
+
+	var tr = wym.findUp(td, 'tr');
+	$(tr).siblings('tr').each( function(index, element) {
+		$(element).find('td:eq('+tdIndex+')').remove();
+	});
+	$(td).remove();
 
 	return false;
 };
