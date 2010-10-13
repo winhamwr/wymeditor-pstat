@@ -64,7 +64,7 @@ TableEditor.prototype.init = function() {
 	var wym = this._wym;
 	var table_editor = this;
 
-    // Add the tool panel buttons
+	// Add the tool panel buttons
 	var tools = $(wym._box).find(
 		wym._options.toolsSelector + wym._options.toolsListSelector)
 
@@ -75,31 +75,30 @@ TableEditor.prototype.init = function() {
 
 	// Handle tool button click
 	$(wym._box).find(table_editor._options.sAddRowButtonSelector).click(function() {
-		table_editor.addRow(wym.selected());
-		return false;
+		return table_editor.addRow(wym.selected());
 	});
 	$(wym._box).find(table_editor._options.sRemoveRowButtonSelector).click(function() {
-		table_editor.removeRow(wym.selected());
-		return false;
+		return table_editor.removeRow(wym.selected());
 	});
 	$(wym._box).find(table_editor._options.sAddColumnButtonSelector).click(function() {
-		table_editor.addColumn(wym.selected());
-		return false;
+		return table_editor.addColumn(wym.selected());
 	});
 	$(wym._box).find(table_editor._options.sRemoveColumnButtonSelector).click(function() {
-		table_editor.removeColumn(wym.selected());
-		return false;
+		return table_editor.removeColumn(wym.selected());
 	});
 };
 
 /*
- * Add a row to the given elmnt (representing a <tr> or a child of a <tr>).
- */
+	* Add a row to the given elmnt (representing a <tr> or a child of a <tr>).
+	*/
 TableEditor.prototype.addRow = function(elmnt) {
 	var wym = this._wym;
 	var tr = wym.findUp(elmnt, 'tr');
+	if ( tr == null ) {
+		return false;
+	}
 
-	// Find out how many td elements in this tr
+	// Find out how many td elements are in this tr
 	var td_children = $(tr).children('td');
 
 	var td_html = '';
@@ -107,30 +106,41 @@ TableEditor.prototype.addRow = function(elmnt) {
 		td_html += '<td>&nbsp;</td>';
 	}
 	$(tr).after('<tr>'+td_html+'</tr>');
+
+	return false;
 };
 
 /*
- * Remove the row for the given element (representing a <tr> or a child
- * of a <tr>).
- */
+	* Remove the row for the given element (representing a <tr> or a child
+	* of a <tr>).
+	*/
 TableEditor.prototype.removeRow = function(elmnt) {
 	var wym = this._wym;
 	var tr = wym.findUp(elmnt, 'tr');
+	if ( tr == null ) {
+		return false;
+	}
 	$(tr).remove();
+
+	return false;
 };
 
 /*
- * Add a column to the given elmnt (representing a <td> or a child of a <td>).
- */
+	* Add a column to the given elmnt (representing a <td> or a child of a <td>).
+	*/
 TableEditor.prototype.addColumn = function(elmnt) {
 	var wym = this._wym;
+
+	return false;
 };
 
 /*
- * Remove the column to the right of the given elmnt (representing a <td> or a
- * child of a <td>).
- */
+	* Remove the column to the right of the given elmnt (representing a <td> or a
+	* child of a <td>).
+	*/
 TableEditor.prototype.removeColumn = function(elmnt) {
 	var wym = this._wym;
+
+	return false;
 };
 
