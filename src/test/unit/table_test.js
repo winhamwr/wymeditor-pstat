@@ -71,6 +71,26 @@ function runPostInitTests() {
 		'</tbody>' +
 	'</table>';
 
+	// Table with colspan and rowspan
+	var fancyTableHtml = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
 	var basicWithPHtml = '<p id="p1">1</p>' + basicTableHtml;
 
 	var addRowTd32Html = '' +
@@ -173,6 +193,208 @@ function runPostInitTests() {
 		'</tbody>' +
 	'</table>';
 
+	var addRowFancyTd12 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+			'</tr>' +
+			'<tr>' +
+				'<td>&#160;</td>' +
+				'<td>&#160;</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var addRowFancyTd22 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="3">2_3</td>' +
+			'</tr>' +
+			'<tr>' +
+				'<td>&#160;</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var addRowFancyTd32 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+			'</tr>' +
+			'<tr>' +
+				'<td>&#160;</td>' +
+				'<td>&#160;</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var addColumnFancyTd12 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var addColumnFancyTd23 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var addColumnFancyTd32 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var addColumnFancyTd11 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td>&#160;</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td>&#160;</td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td>&#160;</td>' +
+				'<td id="td_3_2">3_2</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var addColumnFancyTd21 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td>&#160;</td>' +
+				'<td id="td_1_2" colspan="2">1_2</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td>&#160;</td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td>&#160;</td>' +
+				'<td id="td_3_2">3_2</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var addColumnFancyTd22 = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1">1_1</td>' +
+				'<td id="td_1_2" colspan="3">1_2</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td>&#160;</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td>&#160;</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
 	test("Add/Remove does nothing on non-table elements", function() {
 		expect(4);
 
@@ -215,4 +437,95 @@ function runPostInitTests() {
 		testTable( '#span_2_1', 'add', 'row', basicTableHtml, addRowSpan21Html );
 		testTable( '#tr_2 + tr td:eq(0)', 'remove', 'row', addRowSpan21Html, basicTableHtml );
 	});
+
+	test("Add/Remove Row (fancy)", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#td_3_2', 'add', 'row', fancyTableHtml, addRowFancyTd32);
+		testTable( '#tr_3 + tr td:eq(0)', 'remove', 'row', addRowFancyTd32, fancyTableHtml);
+	});
+
+	test("Add/Remove Row (fancy) in colspan", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#td_1_2', 'add', 'row', fancyTableHtml, addRowFancyTd12);
+		testTable( '#tr_1 + tr td:eq(0)', 'remove', 'row', addRowFancyTd12, fancyTableHtml);
+	});
+
+	test("Add/Remove Row (fancy) in rowspan", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#td_2_2', 'add', 'row', fancyTableHtml, addRowFancyTd22);
+		testTable( '#tr_2 + tr td:eq(0)', 'remove', 'row', addRowFancyTd22, fancyTableHtml);
+	});
+
+	test("Add/Remove Column (fancy) in colspan", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#td_1_2', 'add', 'column', fancyTableHtml, addColumnFancyTd12);
+		testTable( '#td_1_2 + td', 'remove', 'column', addColumnFancyTd12, fancyTableHtml);
+	});
+
+	test("Add/Remove Column (fancy) in rowspan", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#td_2_3', 'add', 'column', fancyTableHtml, addColumnFancyTd23);
+		testTable( '#td_2_3 + td', 'remove', 'column', addColumnFancyTd23, fancyTableHtml);
+	});
+
+	test("Add/Remove Column (fancy) before rowspan", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#td_3_2', 'add', 'column', fancyTableHtml, addColumnFancyTd32);
+		testTable( '#td_3_2 + td', 'remove', 'column', addColumnFancyTd32, fancyTableHtml);
+	});
+
+	test("Add/Remove Column (fancy) before colspan", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#td_1_1', 'add', 'column', fancyTableHtml, addColumnFancyTd11);
+		testTable( '#td_1_1 + td', 'remove', 'column', addColumnFancyTd11, fancyTableHtml);
+	});
+
+	test("Add/Remove Column (fancy) in span", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#span_2_1', 'add', 'column', fancyTableHtml, addColumnFancyTd21);
+		testTable( '#td_2_1 + td', 'remove', 'column', addColumnFancyTd21, fancyTableHtml);
+	});
+
+	test("Add/Remove Column (fancy) affecting colspan", function() {
+		expect(2);
+
+		var wymeditor = jQuery.wymeditors(0);
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		testTable( '#td_2_2', 'add', 'column', fancyTableHtml, addColumnFancyTd22);
+		testTable( '#td_2_2 + td', 'remove', 'column', addColumnFancyTd22, fancyTableHtml);
+	});
+
 };
