@@ -89,6 +89,30 @@ TableEditor.prototype.init = function() {
 };
 
 /*
+ * Get the number of columns in a given tr element, accounting for colspan and
+ * rowspan.
+ */
+TableEditor.prototype.getNumColumns = function(tr) {
+	var wym = this._wym;
+	var numColumns = 0;
+
+	var table = wym.findUp(tr, 'table');
+	var firstTr = $(table).find('tr:eq(0)');
+
+	// Count the tds in the FIRST ROW of this table, accounting for colspan
+	// We count the first td because it won't have any rowspan's before it to
+	// complicate things
+	$(firstTr).children('td').each( function(index, elmnt) {
+		var colspan = $(elmnt).attr('colspan');
+		if( colspan == null ) {
+			colspan = 1;
+		}
+		numColumns += parseInt(colspan);
+	});
+
+	return numColumns;
+}
+/*
 	* Add a row to the given elmnt (representing a <tr> or a child of a <tr>).
 	*/
 TableEditor.prototype.addRow = function(elmnt) {
@@ -98,11 +122,10 @@ TableEditor.prototype.addRow = function(elmnt) {
 		return false;
 	}
 
-	// Find out how many td elements are in this tr
-	var td_children = $(tr).children('td');
+	var numColumns = this.getNumColumns(tr);
 
 	var td_html = '';
-	for(i=0;i<td_children.length;i++) {
+	for(i=0; i<numColumns; i++) {
 		td_html += '<td>&nbsp;</td>';
 	}
 	$(tr).after('<tr>'+td_html+'</tr>');
