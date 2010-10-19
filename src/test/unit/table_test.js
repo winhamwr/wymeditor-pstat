@@ -6,7 +6,6 @@ test("Instantiate", function() {
 		stylesheet: 'styles.css',
 		postInit: function(wym) {
 			var table_editor = wym.table();
-			table_editor.init();
 			runPostInitTests();
 		}
 	});

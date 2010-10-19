@@ -58,6 +58,8 @@ function TableEditor(options, wym) {
 
 	this._options = options;
 	this._wym = wym;
+
+	this.init();
 };
 
 TableEditor.prototype.init = function() {
