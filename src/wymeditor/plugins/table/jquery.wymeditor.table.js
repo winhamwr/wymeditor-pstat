@@ -101,10 +101,10 @@ TableEditor.prototype.getNumColumns = function(tr) {
 	var table = wym.findUp(tr, 'table');
 	var firstTr = $(table).find('tr:eq(0)');
 
-	// Count the tds in the FIRST ROW of this table, accounting for colspan
+	// Count the tds and ths in the FIRST ROW of this table, accounting for colspan
 	// We count the first td because it won't have any rowspan's before it to
 	// complicate things
-	$(firstTr).children('td').each( function(index, elmnt) {
+	$(firstTr).children('td,th').each( function(index, elmnt) {
 		var colspan = $(elmnt).attr('colspan');
 		if( colspan == null ) {
 			colspan = 1;
@@ -155,18 +155,25 @@ TableEditor.prototype.removeRow = function(elmnt) {
 	*/
 TableEditor.prototype.addColumn = function(elmnt) {
 	var wym = this._wym;
-	var td = wym.findUp(elmnt, 'td');
+	var td = wym.findUp(elmnt, ['td', 'th']);
 	if ( td == null ) {
 		return false;
 	}
 	var prevTds = $(td).prevAll();
 	var tdIndex = prevTds.length;
 
+	var newTd = '<td>&nbsp;</td>';
+	var newTh = '<th>&nbsp;</th>';
 	var tr = wym.findUp(td, 'tr');
-	$(tr).siblings('tr').each( function(index, element) {
-		$(element).find('td:eq('+tdIndex+')').after('<td>&nbsp;</td>');
+	$(tr).siblings('tr').andSelf().each( function(index, element) {
+		var insertionElement = newTd;
+		if ( $(element).find('th').length > 0 ) {
+			// The row has a TH, so insert a th
+			insertionElement = newTh;
+		}
+
+		$(element).find('td,th').eq(tdIndex).after(insertionElement);
 	});
-	$(td).after('<td>&nbsp;</td>');
 
 	return false;
 };
@@ -177,7 +184,7 @@ TableEditor.prototype.addColumn = function(elmnt) {
 	*/
 TableEditor.prototype.removeColumn = function(elmnt) {
 	var wym = this._wym;
-	var td = wym.findUp(elmnt, 'td');
+	var td = wym.findUp(elmnt, ['td', 'th']);
 	if ( td == null ) {
 		return false;
 	}
@@ -186,7 +193,7 @@ TableEditor.prototype.removeColumn = function(elmnt) {
 
 	var tr = wym.findUp(td, 'tr');
 	$(tr).siblings('tr').each( function(index, element) {
-		$(element).find('td:eq('+tdIndex+')').remove();
+		$(element).find('td,th').eq(tdIndex).remove();
 	});
 	$(td).remove();
 
