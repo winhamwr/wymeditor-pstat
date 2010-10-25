@@ -1,18 +1,3 @@
-module("table-init");
-
-test("Instantiate", function() {
-	expect(2);
-	jQuery('.wymeditor').wymeditor({
-		stylesheet: 'styles.css',
-		postInit: function(wym) {
-			var tableEditor = wym.table();
-			runPostInitTests();
-		}
-	});
-	equals( WYMeditor.INSTANCES.length, 1, "WYMeditor.INSTANCES length" );
-	equals( typeof(jQuery.wymeditors(0)), 'object', "Type of first WYMeditor instance, using jQuery.wymeditors(0)" );
-});
-
 /**
 * Run a table modification and verify the results.
 *
@@ -70,7 +55,7 @@ function testTableTab( startHtml, startSelector, endSelector ) {
 	}
 }
 
-function runPostInitTests() {
+function runTableTests() {
 	module("Table Modification");
 
 	var basicTableHtml = '' +
