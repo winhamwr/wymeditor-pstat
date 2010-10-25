@@ -78,6 +78,7 @@ TableEditor.prototype.init = function() {
 	tools.append(tableEditor._options.sRemoveColumnButtonHtml);
 
 	tableEditor.bindEvents();
+	rangy.init();
 };
 
 TableEditor.prototype.bindEvents = function() {
@@ -261,12 +262,17 @@ TableEditor.prototype.selectNextCell = function(elmnt) {
 };
 
 TableEditor.prototype.selectElement = function(elmnt) {
-	var sel = this._wym._iframe.contentWindow.getSelection();
+	var iframeWin = this._wym._iframe.contentDocument ? this._wym._iframe.contentDocument.defaultView : this._wym._iframe.contentWindow;
+	var sel = rangy.getSelection(iframeWin);
 
-	var range = this._wym._doc.createRange();
+	var range = rangy.createRange(this._wym._doc);
 	range.setStart( elmnt, 0 );
 	range.setEnd( elmnt, 0 );
+	range.collapse(false);
 
-	sel.removeAllRanges();
-	sel.addRange( range );
+	sel.setSingleRange( range );
+	// IE selection hack
+	if ( $.browser.msie ) {
+		this._wym.saveCaret();
+	}
 }

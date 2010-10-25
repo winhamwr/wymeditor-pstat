@@ -12,14 +12,21 @@ function htmlEquals( wymeditor, expected ) {
 * Move the selection to the start of the given element within the editor.
 */
 function moveSelector( wymeditor, selectedElement ) {
-	var sel = wymeditor._iframe.contentWindow.getSelection();
+	var iframeWin = wymeditor._iframe.contentDocument ? wymeditor._iframe.contentDocument.defaultView : wymeditor._iframe.contentWindow;
+	var sel = rangy.getSelection(iframeWin);
 
-	var range = wymeditor._doc.createRange();
+	var range = rangy.createRange(wymeditor._doc);
 	range.setStart( selectedElement, 0 );
 	range.setEnd( selectedElement, 0 );
+	range.collapse(false);
 
-	sel.removeAllRanges();
-	sel.addRange( range );
+	sel.setSingleRange( range );
+	// IE selection hack
+	if ( $.browser.msie ) {
+		this._wym.saveCaret();
+	}
+
+	equals( wymeditor.selected(), selectedElement );
 }
 
 /*

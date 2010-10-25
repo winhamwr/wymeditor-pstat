@@ -223,7 +223,10 @@ WYMeditor.WymClassExplorer.prototype.keyup = function(evt) {
         //text nodes replaced by P
 
         container = wym.selected();
-        var name = container.tagName.toLowerCase();
+		var name = '';
+		if ( container != null ) {
+			name = container.tagName.toLowerCase();
+		}
 
         //fix forbidden main containers
         if( name == "strong"
