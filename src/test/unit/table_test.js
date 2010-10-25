@@ -1,11 +1,11 @@
-module("Core");
+module("table-init");
 
 test("Instantiate", function() {
 	expect(2);
 	jQuery('.wymeditor').wymeditor({
 		stylesheet: 'styles.css',
 		postInit: function(wym) {
-			var table_editor = wym.table();
+			var tableEditor = wym.table();
 			runPostInitTests();
 		}
 	});
@@ -31,19 +31,43 @@ function testTable( selector, action, type, startHtml, expectedHtml ) {
 
 	if ( action === 'add' ) {
 		if ( type === 'row' ) {
-			wymeditor.table_editor.addRow(actionElmnt);
+			wymeditor.tableEditor.addRow(actionElmnt);
 		} else {
-			wymeditor.table_editor.addColumn(actionElmnt);
+			wymeditor.tableEditor.addColumn(actionElmnt);
 		}
 	} else if ( action === 'remove' ) {
 		if ( type === 'row' ) {
-			wymeditor.table_editor.removeRow(actionElmnt);
+			wymeditor.tableEditor.removeRow(actionElmnt);
 		} else {
-			wymeditor.table_editor.removeColumn(actionElmnt);
+			wymeditor.tableEditor.removeColumn(actionElmnt);
 		}
 	}
 
 	htmlEquals( wymeditor, expectedHtml )
+}
+
+function testTableTab( startHtml, startSelector, endSelector ) {
+	var wymeditor = jQuery.wymeditors(0);
+	wymeditor.html( startHtml );
+
+	var $body = $(wymeditor._doc).find('body.wym_iframe');
+	var startElmnt = $body.find(startSelector)[0];
+	ok( startElmnt != null);
+	moveSelector(wymeditor, startElmnt);
+
+	simulateKey( WYMeditor.KEY.TAB, startElmnt );
+
+	var actualSelection = wymeditor.selected();
+	if ( endSelector == null ) {
+		equals( actualSelection, null );
+	} else {
+		var expectedSelection = $body.find(endSelector);
+		if ( expectedSelection.length != 0 ) {
+			expectedSelection = expectedSelection[0];
+		}
+
+		equals( actualSelection, expectedSelection );
+	}
 }
 
 function runPostInitTests() {
@@ -516,7 +540,8 @@ function runPostInitTests() {
 		'</tbody>' +
 	'</table>';
 
-	test("Add/Remove does nothing on non-table elements", function() {
+	module("table- add/remove");
+	test("no-op on non-table elements", function() {
 		expect(4);
 
 		testTable( '#p_1', 'add', 'column', basicWithPHtml, basicWithPHtml );
@@ -525,21 +550,21 @@ function runPostInitTests() {
 		testTable( '#p_1', 'remove', 'row', basicWithPHtml, basicWithPHtml );
 	});
 
-	test("Add/Remove Column mid column", function() {
+	test("Column mid column", function() {
 		expect(2);
 
 		testTable( '#td_3_2', 'add', 'column', basicTableHtml, addColumnTd32Html );
 		testTable( '#td_3_2 + td', 'remove', 'column', addColumnTd32Html, basicTableHtml );
 	});
 
-	test("Add/Remove Column from span", function() {
+	test("Column from span", function() {
 		expect(2);
 
 		testTable( '#span_2_1', 'add', 'column', basicTableHtml, addColumnSpan21Html );
 		testTable( '#td_2_1 + td', 'remove', 'column', addColumnSpan21Html, basicTableHtml );
 	});
 
-	test("Add/Remove Row end row", function() {
+	test("Row end row", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -549,7 +574,7 @@ function runPostInitTests() {
 		testTable( '#tr_3 + tr td:eq(1)', 'remove', 'row', addRowTd32Html, basicTableHtml );
 	});
 
-	test("Add/Remove Row from span", function() {
+	test("Row from span", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -559,7 +584,8 @@ function runPostInitTests() {
 		testTable( '#tr_2 + tr td:eq(0)', 'remove', 'row', addRowSpan21Html, basicTableHtml );
 	});
 
-	test("Add/Remove Row (fancy)", function() {
+	module("table- colspan/rowspan add/remove");
+	test("Row", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -569,7 +595,7 @@ function runPostInitTests() {
 		testTable( '#tr_3 + tr td:eq(0)', 'remove', 'row', addRowFancyTd32, fancyTableHtml);
 	});
 
-	test("Add/Remove Row (fancy) in colspan", function() {
+	test("Row in colspan", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -579,7 +605,7 @@ function runPostInitTests() {
 		testTable( '#tr_1 + tr td:eq(0)', 'remove', 'row', addRowFancyTd12, fancyTableHtml);
 	});
 
-	test("Add/Remove Row (fancy) in rowspan", function() {
+	test("Row in rowspan", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -589,7 +615,7 @@ function runPostInitTests() {
 		testTable( '#tr_2 + tr td:eq(0)', 'remove', 'row', addRowFancyTd22, fancyTableHtml);
 	});
 
-	test("Add/Remove Column (fancy) in colspan", function() {
+	test("Column in colspan", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -599,7 +625,7 @@ function runPostInitTests() {
 		testTable( '#td_1_2 + td', 'remove', 'column', addColumnFancyTd12, fancyTableHtml);
 	});
 
-	test("Add/Remove Column (fancy) in rowspan", function() {
+	test("Column in rowspan", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -609,7 +635,7 @@ function runPostInitTests() {
 		testTable( '#td_2_3 + td', 'remove', 'column', addColumnFancyTd23, fancyTableHtml);
 	});
 
-	test("Add/Remove Column (fancy) before rowspan", function() {
+	test("Column before rowspan", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -619,7 +645,7 @@ function runPostInitTests() {
 		testTable( '#td_3_2 + td', 'remove', 'column', addColumnFancyTd32, fancyTableHtml);
 	});
 
-	test("Add/Remove Column (fancy) before colspan", function() {
+	test("Column before colspan", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -629,7 +655,7 @@ function runPostInitTests() {
 		testTable( '#td_1_1 + td', 'remove', 'column', addColumnFancyTd11, fancyTableHtml);
 	});
 
-	test("Add/Remove Column (fancy) in span", function() {
+	test("Column in span", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -639,7 +665,7 @@ function runPostInitTests() {
 		testTable( '#td_2_1 + td', 'remove', 'column', addColumnFancyTd21, fancyTableHtml);
 	});
 
-	test("Add/Remove Column (fancy) affecting colspan", function() {
+	test("Column affecting colspan", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -649,21 +675,21 @@ function runPostInitTests() {
 		testTable( '#td_2_2 + td', 'remove', 'column', addColumnFancyTd22, fancyTableHtml);
 	});
 
-	test("Add/Remove Column with TH mid column", function() {
+	test("Column with TH mid column", function() {
 		expect(2);
 
 		testTable( '#td_3_2', 'add', 'column', thTableHtml, addColumnThTd32Html );
 		testTable( '#td_3_2 + td', 'remove', 'column', addColumnThTd32Html, thTableHtml );
 	});
 
-	test("Add/Remove Column with TH in th", function() {
+	test("Column with TH in th", function() {
 		expect(2);
 
 		testTable( '#th_1_3', 'add', 'column', thTableHtml, addColumnThTh13Html );
 		testTable( '#th_1_3 + th', 'remove', 'column', addColumnThTh13Html, thTableHtml );
 	});
 
-	test("Add/Remove Row with TH end row", function() {
+	test("Row with TH end row", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -673,7 +699,7 @@ function runPostInitTests() {
 		testTable( '#tr_3 + tr td:eq(1)', 'remove', 'row', addRowThTd32Html, thTableHtml );
 	});
 
-	test("Add/Remove Row with TH first th row", function() {
+	test("Row with TH first th row", function() {
 		expect(2);
 
 		var wymeditor = jQuery.wymeditors(0);
@@ -681,5 +707,34 @@ function runPostInitTests() {
 
 		testTable( '#th_1_3', 'add', 'row', thTableHtml, addRowThTh13Html );
 		testTable( '#tr_1 + tr td:eq(2)', 'remove', 'row', addRowThTh13Html, thTableHtml );
+	});
+
+	module("table- tab movement");
+	test("Tab to cell right", function() {
+		testTableTab( basicTableHtml, '#td_1_1', '#td_1_2' );
+	});
+
+	test("Tab from th to cell right", function() {
+		testTableTab( thTableHtml, '#th_1_1', '#th_1_2' );
+	});
+
+	test("Tab to next row", function() {
+		testTableTab( basicTableHtml, '#td_1_1', '#td_2_1' );
+	});
+
+	test("Tab from th to next row", function() {
+		testTableTab( thTableHtml, '#th_1_1', '#td_2_1' );
+	});
+
+	test("Tab end of table", function() {
+		testTableTab( basicTableHtml, '#td_3_3', null );
+	});
+
+	test("Tab nested inside table", function() {
+		testTableTab( basicTableHtml, '#span_2_1', '#td_2_2' );
+	});
+
+	test("Tab outside of table", function() {
+		testTableTab( basicTableHtml+'<p id="p_1">p1</p>', '#p_1', null );
 	});
 };

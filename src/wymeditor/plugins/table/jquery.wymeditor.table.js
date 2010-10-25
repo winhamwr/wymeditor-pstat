@@ -10,10 +10,10 @@
 // and licensed under Creative Commons Attribution
 
 WYMeditor.editor.prototype.table = function(options) {
-	var table_editor = new TableEditor(options, this);
-	this.table_editor = table_editor;
+	var tableEditor = new TableEditor(options, this);
+	this.tableEditor = tableEditor;
 
-	return(table_editor);
+	return(tableEditor);
 };
 
 function TableEditor(options, wym) {
@@ -64,31 +64,41 @@ function TableEditor(options, wym) {
 
 TableEditor.prototype.init = function() {
 	var wym = this._wym;
-	var table_editor = this;
+	var tableEditor = this;
 
 	// Add the tool panel buttons
 	var tools = $(wym._box).find(
 		wym._options.toolsSelector + wym._options.toolsListSelector)
 
-	tools.append(table_editor._options.sAddRowButtonHtml);
-	tools.append(table_editor._options.sRemoveRowButtonHtml);
-	tools.append(table_editor._options.sAddColumnButtonHtml);
-	tools.append(table_editor._options.sRemoveColumnButtonHtml);
+	tools.append(tableEditor._options.sAddRowButtonHtml);
+	tools.append(tableEditor._options.sRemoveRowButtonHtml);
+	tools.append(tableEditor._options.sAddColumnButtonHtml);
+	tools.append(tableEditor._options.sRemoveColumnButtonHtml);
+
+	tableEditor.bindEvents();
+};
+
+TableEditor.prototype.bindEvents = function() {
+	var wym = this._wym;
+	var tableEditor = this;
 
 	// Handle tool button click
-	$(wym._box).find(table_editor._options.sAddRowButtonSelector).click(function() {
-		return table_editor.addRow(wym.selected());
+	$(wym._box).find(tableEditor._options.sAddRowButtonSelector).click(function() {
+		return tableEditor.addRow(wym.selected());
 	});
-	$(wym._box).find(table_editor._options.sRemoveRowButtonSelector).click(function() {
-		return table_editor.removeRow(wym.selected());
+	$(wym._box).find(tableEditor._options.sRemoveRowButtonSelector).click(function() {
+		return tableEditor.removeRow(wym.selected());
 	});
-	$(wym._box).find(table_editor._options.sAddColumnButtonSelector).click(function() {
-		return table_editor.addColumn(wym.selected());
+	$(wym._box).find(tableEditor._options.sAddColumnButtonSelector).click(function() {
+		return tableEditor.addColumn(wym.selected());
 	});
-	$(wym._box).find(table_editor._options.sRemoveColumnButtonSelector).click(function() {
-		return table_editor.removeColumn(wym.selected());
+	$(wym._box).find(tableEditor._options.sRemoveColumnButtonSelector).click(function() {
+		return tableEditor.removeColumn(wym.selected());
 	});
-};
+
+	// Handle tab clicks
+	$(wym._doc).bind('keydown', tableEditor.keyDown);
+}
 
 /*
  * Get the number of columns in a given tr element, accounting for colspan and
@@ -200,3 +210,50 @@ TableEditor.prototype.removeColumn = function(elmnt) {
 	return false;
 };
 
+TableEditor.prototype.keyDown = function(evt) {
+    //'this' is the doc
+    var wym = WYMeditor.INSTANCES[this.title];
+	var tableEditor = wym.tableEditor;
+
+	if( evt.keyCode == WYMeditor.KEY.TAB ) {
+		return tableEditor.selectNextCell(wym.selected());
+	}
+
+	return null;
+};
+
+/*
+ * Move the focus to the next cell.
+ */
+TableEditor.prototype.selectNextCell = function(elmnt) {
+	var wym = this._wym;
+	var tableEditor = this;
+
+	var cell = wym.findUp(elmnt, ['td', 'th']);
+	if ( cell == null ) {
+		return null;
+	}
+
+	// Try moving to the next cell to the right
+	var nextCells = $(cell).next('td,th').eq(0);
+	if ( nextCells.length != 0 ) {
+		tableEditor.selectElement(nextCells[0]);
+		return false;
+	}
+
+	// There was no cell to the right, use the first in the next row
+
+	// There is no next row. Do a normal tab
+	return null;
+};
+
+TableEditor.prototype.selectElement = function(elmnt) {
+	var sel = this._wym._iframe.contentWindow.getSelection();
+
+	var range = this._wym._doc.createRange();
+	range.setStart( elmnt, 0 );
+	range.setEnd( elmnt, 0 );
+
+	sel.removeAllRanges();
+	sel.addRange( range );
+}
