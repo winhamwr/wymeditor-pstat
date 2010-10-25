@@ -23,7 +23,7 @@ function moveSelector( wymeditor, selectedElement ) {
 	sel.setSingleRange( range );
 	// IE selection hack
 	if ( $.browser.msie ) {
-		this._wym.saveCaret();
+		wymeditor.saveCaret();
 	}
 
 	equals( wymeditor.selected(), selectedElement );
