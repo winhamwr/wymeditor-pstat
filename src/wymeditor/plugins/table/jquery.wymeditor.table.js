@@ -52,7 +52,9 @@ function TableEditor(options, wym) {
 			+ "Remove Table Column"
 			+ "</a></li>",
 
-		sRemoveColumnButtonSelector: "li.wym_tools_remove_column a"
+		sRemoveColumnButtonSelector: "li.wym_tools_remove_column a",
+
+		enableCellTabbing: true
 
 	}, options);
 
@@ -97,7 +99,9 @@ TableEditor.prototype.bindEvents = function() {
 	});
 
 	// Handle tab clicks
-	$(wym._doc).bind('keydown', tableEditor.keyDown);
+	if( tableEditor._options.enableCellTabbing ) {
+		$(wym._doc).bind('keydown', tableEditor.keyDown);
+	}
 }
 
 /*
@@ -235,13 +239,22 @@ TableEditor.prototype.selectNextCell = function(elmnt) {
 	}
 
 	// Try moving to the next cell to the right
-	var nextCells = $(cell).next('td,th').eq(0);
-	if ( nextCells.length != 0 ) {
+	var nextCells = $(cell).next('td,th');
+	if ( nextCells.length > 0 ) {
 		tableEditor.selectElement(nextCells[0]);
 		return false;
 	}
 
-	// There was no cell to the right, use the first in the next row
+	// There was no cell to the right, use the first cell in the next row
+	var tr = wym.findUp(cell, 'tr');
+	var nextRows = $(tr).next('tr');
+	if ( nextRows.length != 0 ) {
+		var nextCells = $(nextRows).children('td,th');
+		if ( nextCells.length > 0 ) {
+			tableEditor.selectElement(nextCells[0]);
+			return false;
+		}
+	}
 
 	// There is no next row. Do a normal tab
 	return null;

@@ -711,30 +711,49 @@ function runPostInitTests() {
 
 	module("table- tab movement");
 	test("Tab to cell right", function() {
+		expect(2);
 		testTableTab( basicTableHtml, '#td_1_1', '#td_1_2' );
 	});
 
 	test("Tab from th to cell right", function() {
+		expect(2);
 		testTableTab( thTableHtml, '#th_1_1', '#th_1_2' );
 	});
 
 	test("Tab to next row", function() {
-		testTableTab( basicTableHtml, '#td_1_1', '#td_2_1' );
+		expect(2);
+		var expectedSelector = '#span_2_1';
+		if ( $.browser.mozilla ) {
+			expectedSelector = '#td_2_1';
+		}
+		testTableTab( basicTableHtml, '#td_1_3', expectedSelector );
 	});
 
 	test("Tab from th to next row", function() {
-		testTableTab( thTableHtml, '#th_1_1', '#td_2_1' );
+		expect(2);
+		var expectedSelector = '#span_2_1';
+		if ( $.browser.mozilla ) {
+			expectedSelector = '#td_2_1';
+		}
+		testTableTab( thTableHtml, '#th_1_3', expectedSelector );
 	});
 
 	test("Tab end of table", function() {
-		testTableTab( basicTableHtml, '#td_3_3', null );
+		// The real tab action doesn't trigger. Just make sure we're not moving
+		// around
+		expect(2);
+		testTableTab( basicTableHtml, '#td_3_3', '#td_3_3' );
 	});
 
 	test("Tab nested inside table", function() {
+		expect(2);
 		testTableTab( basicTableHtml, '#span_2_1', '#td_2_2' );
 	});
 
 	test("Tab outside of table", function() {
-		testTableTab( basicTableHtml+'<p id="p_1">p1</p>', '#p_1', null );
+		// The real tab action doesn't trigger. Just make sure we're not moving
+		// around
+		expect(2);
+		testTableTab( basicTableHtml+'<p id="p_1">p1</p>', '#p_1', '#p_1' );
 	});
 };
