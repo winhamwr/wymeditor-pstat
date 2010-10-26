@@ -1,10 +1,13 @@
-function htmlEquals( wymeditor, expected ) {
-	var trimmed = jQuery.trim( wymeditor.xhtml() );
+function trimHtml( html ) {
+	var trimmed = jQuery.trim( html );
 	// This is a super-naive regex to turn things like:
 	//    <html>   </html> => <html></html>
 	// It fails for cases where white space is actually significant like:
 	//    <strong>foo</strong> <em>bar</em>
-	var minned = trimmed.replace(/\>\s+\</g, '><');
+	return trimmed.replace(/\>\s+\</g, '><');
+}
+function htmlEquals( wymeditor, expected ) {
+	var minned = trimHtml( wymeditor.xhtml() );
 	equals( minned, jQuery.trim( expected ) );
 }
 
@@ -27,6 +30,21 @@ function moveSelector( wymeditor, selectedElement ) {
 	}
 
 	equals( wymeditor.selected(), selectedElement );
+}
+
+function makeSelection( wymeditor, startElement, endElement ) {
+	var iframeWin = wymeditor._iframe.contentDocument ? wymeditor._iframe.contentDocument.defaultView : wymeditor._iframe.contentWindow;
+	var sel = rangy.getSelection(iframeWin);
+
+	var range = rangy.createRange(wymeditor._doc);
+	range.setStart( startElement, 0 );
+	range.setEnd( endElement, 0 );
+
+	sel.setSingleRange( range );
+	// IE selection hack
+	if ( $.browser.msie ) {
+		wymeditor.saveCaret();
+	}
 }
 
 /*

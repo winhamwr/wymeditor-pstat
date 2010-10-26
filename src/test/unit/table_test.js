@@ -28,7 +28,7 @@ function testTable( selector, action, type, startHtml, expectedHtml ) {
 		}
 	}
 
-	htmlEquals( wymeditor, expectedHtml )
+	htmlEquals( wymeditor, expectedHtml );
 }
 
 function testTableTab( startHtml, startSelector, endSelector ) {
@@ -47,6 +47,36 @@ function testTableTab( startHtml, startSelector, endSelector ) {
 		equals( actualSelection, null );
 	} else {
 		var expectedSelection = $body.find(endSelector);
+		if ( expectedSelection.length != 0 ) {
+			expectedSelection = expectedSelection[0];
+		}
+
+		equals( actualSelection, expectedSelection );
+	}
+}
+
+function testRowMerge( startHtml, endHtml, startSelector, endSelector, finalSelector ) {
+	var wymeditor = jQuery.wymeditors(0);
+	wymeditor.html( startHtml );
+
+	var $body = $(wymeditor._doc).find('body.wym_iframe');
+	var startElmnt = $body.find(startSelector)[0];
+	ok( startElmnt != null, "Selection start element exists");
+	var endElmnt = $body.find(endSelector)[0];
+	ok( endElmnt != null, "Selection end element exists");
+	makeSelection( wymeditor, startElmnt, endElmnt );
+
+	var iframeWin = wymeditor._iframe.contentDocument ? wymeditor._iframe.contentDocument.defaultView : wymeditor._iframe.contentWindow;
+	var sel = rangy.getSelection(iframeWin);
+	wymeditor.tableEditor.mergeRow(sel);
+
+	htmlEquals( wymeditor, endHtml );
+
+	var actualSelection = wymeditor.selected();
+	if ( finalSelector == null ) {
+		equals( actualSelection, null );
+	} else {
+		var expectedSelection = $body.find(finalSelector);
 		if ( expectedSelection.length != 0 ) {
 			expectedSelection = expectedSelection[0];
 		}
@@ -741,4 +771,96 @@ function runTableTests() {
 		expect(3);
 		testTableTab( basicTableHtml+'<p id="p_1">p1</p>', '#p_1', '#p_1' );
 	});
+
+	module("table-row_merge");
+
+	function isColspanFirst() {
+		var startHtml = '<table><tr><td id="td_1"></td></tr></table>';
+		var colspanFirst = '<table><tr><td colspan="2" id="td_1"></td></tr></table>';
+
+		var wymeditor = jQuery.wymeditors(0);
+		wymeditor.html( startHtml );
+
+		var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+		$body.find('#td_1').attr('colspan', 2);
+
+		if ( trimHtml(wymeditor.xhtml()) == colspanFirst ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	var isColspanFirstBrowser = isColspanFirst();
+
+	var mergeTableHtml = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th id="th_1_2" colspan="2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTd41Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th id="th_1_2" colspan="2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">';
+		if ( isColspanFirstBrowser ) {
+			mergeTd41Html += '' +
+				'<td colspan="2" id="td_4_1">4_14_2</td>';
+		} else {
+			mergeTd41Html += '' +
+				'<td id="td_4_1" colspan="2">4_14_2</td>';
+		}
+	mergeTd41Html += '' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	test("Merge simple first cell", function() {
+		expect(4);
+
+		testRowMerge( mergeTableHtml, mergeTd41Html, '#td_4_1', '#td_4_2', '#td_4_1' );
+	});
+
+
 };

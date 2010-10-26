@@ -18,6 +18,15 @@ WYMeditor.editor.prototype.table = function(options) {
 
 function TableEditor(options, wym) {
 	options = jQuery.extend({
+		sMergeRowButtonHtml:   "<li class='wym_tools_merge_row'>"
+			+ "<a name='merge_row' href='#'"
+			+ " style='background-image:"
+			+ " url(" + wym._options.basePath + "plugins/table/table_join_row.png)'>"
+			+ "Merge Table Row"
+			+ "</a></li>",
+
+		sMergeRowButtonSelector: "li.wym_tools_merge_row a",
+
 		sAddRowButtonHtml:   "<li class='wym_tools_add_row'>"
 			+ "<a name='add_row' href='#'"
 			+ " style='background-image:"
@@ -72,6 +81,7 @@ TableEditor.prototype.init = function() {
 	var tools = $(wym._box).find(
 		wym._options.toolsSelector + wym._options.toolsListSelector)
 
+	tools.append(tableEditor._options.sMergeRowButtonHtml);
 	tools.append(tableEditor._options.sAddRowButtonHtml);
 	tools.append(tableEditor._options.sRemoveRowButtonHtml);
 	tools.append(tableEditor._options.sAddColumnButtonHtml);
@@ -86,6 +96,11 @@ TableEditor.prototype.bindEvents = function() {
 	var tableEditor = this;
 
 	// Handle tool button click
+	$(wym._box).find(tableEditor._options.sMergeRowButtonSelector).click(function() {
+		var iframeWin = wym._iframe.contentDocument ? wym._iframe.contentDocument.defaultView : wym._iframe.contentWindow;
+		var sel = rangy.getSelection(iframeWin);
+		return tableEditor.mergeRow(sel);
+	});
 	$(wym._box).find(tableEditor._options.sAddRowButtonSelector).click(function() {
 		return tableEditor.addRow(wym.selected());
 	});
@@ -129,6 +144,65 @@ TableEditor.prototype.getNumColumns = function(tr) {
 
 	return numColumns;
 }
+
+/*
+	* Merge the table cells in the given selection using a colspan.
+	*/
+TableEditor.prototype.mergeRow = function(sel) {
+	var wym = this._wym;
+
+	if ( sel.rangeCount == 0 ) {
+		return false;
+	}
+
+	var range = sel.getRangeAt(0);
+
+	var nodes = range.getNodes(false);
+	var cells = [];
+	var cells = $(nodes).filter('td,th');
+	var mergeCell = cells[0];
+
+	if ( cells.length == 0 ) {
+		return false;
+	}
+	var parentTrList = $(mergeCell).parent('tr');
+	if ( parentTrList.length == 0 ) {
+		return false;
+	}
+	var rootTr = parentTrList[0];
+
+	// Ensure that all of the cells have the same parent tr
+	$(cells).each( function(index, elmnt) {
+		var parentTrList = $(elmnt).parent('tr');
+		if ( parentTrList.length == 0 || parentTrList[0] != rootTr ) {
+			return false;
+		}
+	});
+
+	// Build the content of the new combined cell from all of the included cells
+	var newContent = '';
+	$(cells).each( function(index, elmnt) {
+		newContent += $(elmnt).html();
+	});
+
+	// Add a colspan to the farthest-left cell
+	$(mergeCell).attr('colspan', cells.length);
+
+	// Delete the rest of the cells
+	$(cells).each( function(index, elmnt) {
+		if ( index != 0 ) {
+			$(elmnt).remove();
+		}
+	});
+
+	// Change the content in our newly-merged cell
+	$(mergeCell).html(newContent);
+
+	this.selectElement(mergeCell);
+
+	return false;
+};
+
 /*
 	* Add a row to the given elmnt (representing a <tr> or a child of a <tr>).
 	*/
