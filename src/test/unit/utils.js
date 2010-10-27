@@ -1,3 +1,70 @@
+/**
+* Order HTML attributes for consistent HTML comparison.
+*
+* Adapted from google-code-prettify
+* http://code.google.com/p/google-code-prettify/source/browse/trunk/src/prettify.js#311
+* Apache license, Copyright (C) 2006 Google Inc.
+*/
+function normalizeHtml(node) {
+	var html = '';
+	switch (node.nodeType) {
+		case 1:  // an element
+			var name = node.tagName.toLowerCase();
+
+			html += '<'+name;
+			var attrs = node.attributes;
+			var n = attrs.length;
+			if (n) {
+				var sortedAttrs = [];
+				for (var i = n; --i >= 0;) { sortedAttrs[i] = attrs[i]; }
+				sortedAttrs.sort(function (a, b) {
+					return (a.name < b.name) ? -1 : a.name === b.name ? 0 : 1;
+				});
+				attrs = sortedAttrs;
+
+				for (var i = 0; i < n; ++i) {
+					var attr = attrs[i];
+					if (!attr.specified) { continue; }
+					html += ' ' + attr.name.toLowerCase() +
+						'="' + attribToHtml(attr.value) + '"';
+				}
+			}
+			html += '>';
+			for (var child = node.firstChild; child; child = child.nextSibling) {
+				html += normalizeHtml(child);
+			}
+			if (node.firstChild || !/^(?:br|link|img)$/.test(name)) {
+				html += '<\/' + name + '>';
+			}
+			break;
+		case 3: case 4: // text
+			html += textToHtml(node.nodeValue);
+			break;
+	}
+
+	return html;
+}
+
+function attribToHtml(str) {
+	return str.replace(pr_amp, '&amp;')
+		.replace(pr_lt, '&lt;')
+		.replace(pr_gt, '&gt;')
+		.replace(pr_quot, '&quot;');
+}
+
+var pr_amp = /&/g;
+var pr_lt = /</g;
+var pr_gt = />/g;
+var pr_quot = /\"/g;
+/**
+* Escape html special characters.
+*/
+function textToHtml(str) {
+	return str.replace(pr_amp, '&amp;')
+		.replace(pr_lt, '&lt;')
+        .replace(pr_gt, '&gt;');
+}
+
 function trimHtml( html ) {
 	var trimmed = jQuery.trim( html );
 	// This is a super-naive regex to turn things like:
@@ -6,9 +73,12 @@ function trimHtml( html ) {
 	//    <strong>foo</strong> <em>bar</em>
 	return trimmed.replace(/\>\s+\</g, '><');
 }
+
 function htmlEquals( wymeditor, expected ) {
-	var minned = trimHtml( wymeditor.xhtml() );
-	equals( minned, jQuery.trim( expected ) );
+	//var minned = trimHtml( wymeditor.xhtml() );
+	var normedActual = normalizeHtml( $(wymeditor.xhtml())[0] );
+	var normedExpected = normalizeHtml( $(expected)[0] );
+	equals( normedActual, normedExpected );
 }
 
 /**
@@ -47,9 +117,9 @@ function makeSelection( wymeditor, startElement, endElement ) {
 	}
 }
 
-/*
- * Simulate a keypress, firing off the keydown, keypress and keyup events.
- */
+/**
+* Simulate a keypress, firing off the keydown, keypress and keyup events.
+*/
 function simulateKey( keyCode, targetElement, options) {
 	var defaults = {
 		'metaKey': false,

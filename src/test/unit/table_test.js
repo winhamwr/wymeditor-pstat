@@ -774,32 +774,12 @@ function runTableTests() {
 
 	module("table-row_merge");
 
-	function isColspanFirst() {
-		var startHtml = '<table><tr><td id="td_1"></td></tr></table>';
-		var colspanFirst = '<table><tr><td colspan="2" id="td_1"></td></tr></table>';
-
-		var wymeditor = jQuery.wymeditors(0);
-		wymeditor.html( startHtml );
-
-		var $body = $(wymeditor._doc).find('body.wym_iframe');
-
-		$body.find('#td_1').attr('colspan', 2);
-
-		if ( trimHtml(wymeditor.xhtml()) == colspanFirst ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	var isColspanFirstBrowser = isColspanFirst();
-
 	var mergeTableHtml = '' +
 	'<table>' +
 		'<tbody>' +
 			'<tr id="tr_1">' +
 				'<th id="th_1_1">1_1</th>' +
-				'<th id="th_1_2" colspan="2">1_2</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
 				'<th id="th_1_4">1_4</th>' +
 			'</tr>' +
 			'<tr id="tr_2">' +
@@ -827,7 +807,7 @@ function runTableTests() {
 		'<tbody>' +
 			'<tr id="tr_1">' +
 				'<th id="th_1_1">1_1</th>' +
-				'<th id="th_1_2" colspan="2">1_2</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
 				'<th id="th_1_4">1_4</th>' +
 			'</tr>' +
 			'<tr id="tr_2">' +
@@ -841,15 +821,8 @@ function runTableTests() {
 				'<td id="td_3_2">3_2</td>' +
 				'<td id="td_3_4">3_4</td>' +
 			'</tr>' +
-			'<tr id="tr_4">';
-		if ( isColspanFirstBrowser ) {
-			mergeTd41Html += '' +
-				'<td colspan="2" id="td_4_1">4_14_2</td>';
-		} else {
-			mergeTd41Html += '' +
-				'<td id="td_4_1" colspan="2">4_14_2</td>';
-		}
-	mergeTd41Html += '' +
+			'<tr id="tr_4">' +
+				'<td colspan="2" id="td_4_1">4_14_2</td>' +
 				'<td id="td_4_3">4_3</td>' +
 				'<td id="td_4_4">4_4</td>' +
 			'</tr>' +
@@ -862,5 +835,18 @@ function runTableTests() {
 		testRowMerge( mergeTableHtml, mergeTd41Html, '#td_4_1', '#td_4_2', '#td_4_1' );
 	});
 
+
+	module("utils");
+	function testNormalize( testHtml ) {
+		var normed = normalizeHtml( $(testHtml)[0] );
+		equals( normed, testHtml );
+	}
+
+	test("Test Normalize", function() {
+		expect(2);
+
+		testNormalize( mergeTableHtml );
+		testNormalize( mergeTd41Html );
+	});
 
 };
