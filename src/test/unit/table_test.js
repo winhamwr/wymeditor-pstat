@@ -836,6 +836,33 @@ function runTableTests() {
 		'</tbody>' +
 	'</table>';
 
+	var mergeTableLongRowspanHtml = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="3">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
 	var mergeTd41Html = '' +
 	'<table>' +
 		'<tbody>' +
@@ -995,6 +1022,225 @@ function runTableTests() {
 		'</tbody>' +
 	'</table>';
 
+	var mergeTd23Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" colspan="2">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td>2_3</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTd22Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2" colspan="2">2_2</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td>2_3</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTd31Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1" colspan="2">3_13_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTd31Td23Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1" colspan="3">3_13_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTd23Td34Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td colspan="2">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTd42Td23LongRowspanHtml = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2" colspan="2">4_2</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTd23Td44LongRowspanHtml = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td colspan="2">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTd32Td23LongRowspanHtml = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="3">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
 	test("Merge simple first cell", function() {
 		expect(4);
 
@@ -1041,6 +1287,62 @@ function runTableTests() {
 			mergeTableHtml, mergeSpan21Html, '#span_2_1', '#td_2_2', endSelection );
 	});
 
+	module("table-row_merge_rowspan");
+	test("Across rowspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd23Html, '#td_2_3', '#td_2_4', '#td_2_3' );
+	});
+
+	test("Into rowspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd22Html, '#td_2_2', '#td_2_3', '#td_2_2' );
+	});
+
+	test("Below and beside rowspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd31Html, '#td_3_1', '#td_3_2', '#td_3_1' );
+	});
+
+	test("Below and including rowspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd31Td23Html, '#td_3_1', '#td_2_3', '#td_3_1' );
+	});
+
+	test("From rowspan to below", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd23Td34Html, '#td_2_3', '#td_3_4', '#td_3_2 + td' );
+	});
+
+	test("Below and bottom of long rowspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd42Td23LongRowspanHtml, '#td_4_2', '#td_2_3', '#td_4_2' );
+	});
+
+	test("Below and after bottom of long rowspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd23Td44LongRowspanHtml, '#td_2_3', '#td_4_4', '#td_4_2 + td' );
+	});
+
+	test("Middle of rowspan doesn't merge", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd32Td23LongRowspanHtml, '#td_3_2', '#td_2_3', '#td_3_2' );
+	});
 
 	module("utils");
 	function testNormalize( testHtml ) {
