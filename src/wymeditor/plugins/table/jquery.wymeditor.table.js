@@ -145,9 +145,56 @@ TableEditor.prototype.getNumColumns = function(tr) {
 	return numColumns;
 }
 
-/*
-	* Merge the table cells in the given selection using a colspan.
-	*/
+/**
+* Get the number of columns represented by the given array of contiguous cell
+* (td/th) nodes.
+* Accounts for colspan and rowspan attributes.
+*/
+TableEditor.prototype.getTotalColumns = function(cells) {
+	var wym = this._wym;
+	var baseRowColumns = 0; // Number of columns in a uniform table row
+
+	var rootTr = this.getCommonParentTr(cells);
+	if ( rootTr == null ) {
+		// Non-contiguous columns
+		throw "getTotalColumns only allowed for contiguous cells";
+	}
+
+	var baseRowColumns = this.getNumColumns(rootTr);
+
+	// Count the number of simple columns, not accounting for rowspans
+	var colspanCount = 0;
+	$(cells).each( function(index, elmnt) {
+		var colspan = $(elmnt).attr('colspan');
+		if( colspan == null ) {
+			colspan = 1;
+		}
+		colspanCount += parseInt(colspan);
+	});
+
+	// Determine if we're affected by rowspans. If the number of simple columns
+	// in the row equals the number of columns in the first row, we don't have
+	// any rowspans
+	var rowColCount = 0;
+	$(rootTr).children('td,th').each( function(index, elmnt) {
+		var colspan = $(elmnt).attr('colspan');
+		if( colspan == null ) {
+			colspan = 1;
+		}
+		rowColCount += parseInt(colspan);
+	});
+
+	if ( rowColCount == baseRowColumns ) {
+		// Easy case. No rowspans to deal with
+		return colspanCount;
+	} else {
+		throw "AHHH!. rowspans";
+	}
+}
+
+/**
+* Merge the table cells in the given selection using a colspan.
+*/
 TableEditor.prototype.mergeRow = function(sel) {
 	var wym = this._wym;
 
@@ -158,26 +205,16 @@ TableEditor.prototype.mergeRow = function(sel) {
 	var range = sel.getRangeAt(0);
 
 	var nodes = range.getNodes(false);
-	var cells = [];
 	var cells = $(nodes).filter('td,th');
-	var mergeCell = cells[0];
-
 	if ( cells.length == 0 ) {
 		return false;
 	}
-	var parentTrList = $(mergeCell).parent('tr');
-	if ( parentTrList.length == 0 ) {
+	var mergeCell = cells[0];
+
+	var rootTr = this.getCommonParentTr(cells);
+	if ( rootTr == null ) {
 		return false;
 	}
-	var rootTr = parentTrList[0];
-
-	// Ensure that all of the cells have the same parent tr
-	$(cells).each( function(index, elmnt) {
-		var parentTrList = $(elmnt).parent('tr');
-		if ( parentTrList.length == 0 || parentTrList[0] != rootTr ) {
-			return false;
-		}
-	});
 
 	// Build the content of the new combined cell from all of the included cells
 	var newContent = '';
@@ -186,7 +223,8 @@ TableEditor.prototype.mergeRow = function(sel) {
 	});
 
 	// Add a colspan to the farthest-left cell
-	$(mergeCell).attr('colspan', cells.length);
+	var combinedColspan = this.getTotalColumns(cells);
+	$(mergeCell).attr('colspan', combinedColspan);
 
 	// Delete the rest of the cells
 	$(cells).each( function(index, elmnt) {
@@ -349,4 +387,32 @@ TableEditor.prototype.selectElement = function(elmnt) {
 	if ( $.browser.msie ) {
 		this._wym.saveCaret();
 	}
+}
+
+/**
+* Get the common parent tr for the given table cell nodes. If the closest parent
+* tr for each cell isn't the same, returns null.
+*/
+TableEditor.prototype.getCommonParentTr = function(cells) {
+	var cells = $(cells).filter('td,th');
+	if ( cells.length == 0 ) {
+		return null;
+	}
+	var firstCell = cells[0];
+
+	var parentTrList = $(firstCell).parent('tr');
+	if ( parentTrList.length == 0 ) {
+		return null;
+	}
+	var rootTr = parentTrList[0];
+
+	// Ensure that all of the cells have the same parent tr
+	$(cells).each( function(index, elmnt) {
+		var parentTrList = $(elmnt).parent('tr');
+		if ( parentTrList.length == 0 || parentTrList[0] != rootTr ) {
+			return null;
+		}
+	});
+
+	return rootTr;
 }

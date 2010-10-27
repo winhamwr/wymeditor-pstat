@@ -829,10 +829,144 @@ function runTableTests() {
 		'</tbody>' +
 	'</table>';
 
+	var mergeTd41To44Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td colspan="4" id="td_4_1">4_14_24_34_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTh12Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="3" id="th_1_2">1_21_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTh11To12Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th colspan="3" id="th_1_1">1_11_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
+	var mergeTh11To14Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th colspan="4" id="th_1_1">1_11_21_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1"><span id="span_2_1">2_1</span></td>' +
+				'<td id="td_2_2">2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
 	test("Merge simple first cell", function() {
 		expect(4);
 
-		testRowMerge( mergeTableHtml, mergeTd41Html, '#td_4_1', '#td_4_2', '#td_4_1' );
+		testRowMerge(
+			mergeTableHtml, mergeTd41Html, '#td_4_1', '#td_4_2', '#td_4_1' );
+	});
+
+	test("Merge simple multiple cells", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTd41To44Html, '#td_4_1', '#td_4_4', '#td_4_1' );
+	});
+
+	test("Expand existing colspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTh12Html, '#th_1_2', '#th_1_4', '#th_1_2' );
+	});
+
+	test("Expand into existing colspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTh11To12Html, '#th_1_1', '#th_1_2', '#th_1_1' );
+	});
+
+	test("Surround existing colspan", function() {
+		expect(4);
+
+		testRowMerge(
+			mergeTableHtml, mergeTh11To14Html, '#th_1_1', '#th_1_4', '#th_1_1' );
 	});
 
 
