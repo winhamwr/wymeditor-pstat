@@ -85,7 +85,41 @@ function testRowMerge( startHtml, endHtml, startSelector, endSelector, finalSele
 	}
 }
 
+/**
+* Determine if attempting to select a cell with a non-text inner node (a span)
+* actually selects the inner node or selects the cell itself. FF for example,
+* selects the cell while webkit selects the inner.
+*/
+function browserSelectsInnerContent() {
+	var startHtml = '' +
+		'<table>' +
+			'<tbody>' +
+				'<tr>' +
+					'<td id="td_1_1"><span id="span_1_1">span_1_1</span></td>' +
+				'</tr>' +
+			'</tbody>' +
+		'</table>';
+	var spanSelector = '#span_1_1';
+	var tdSelector = '#td_1_1';
+
+	var wymeditor = jQuery.wymeditors(0);
+	wymeditor.html( startHtml );
+
+	var $body = $(wymeditor._doc).find('body.wym_iframe');
+
+	var td = $body.find(tdSelector)[0];
+	var span = $body.find(spanSelector)[0];
+	wymeditor.tableEditor.selectElement($body.find(tdSelector)[0]);
+
+	if ( wymeditor.selected() == span ) {
+		return true;
+	}
+	return false;
+}
+
 function runTableTests() {
+	var isInnerSelector = browserSelectsInnerContent();
+
 	module("Table Modification");
 
 	var basicTableHtml = '' +
@@ -737,9 +771,9 @@ function runTableTests() {
 
 	test("Tab to next row", function() {
 		expect(3);
-		var expectedSelector = '#span_2_1';
-		if ( $.browser.mozilla ) {
-			expectedSelector = '#td_2_1';
+		var expectedSelector = '#td_2_1';
+		if ( isInnerSelector ) {
+			var expectedSelector = '#span_2_1';
 		}
 		testTableTab( basicTableHtml, '#td_1_3', expectedSelector );
 	});
@@ -934,6 +968,33 @@ function runTableTests() {
 		'</tbody>' +
 	'</table>';
 
+	var mergeSpan21Html = '' +
+	'<table>' +
+		'<tbody>' +
+			'<tr id="tr_1">' +
+				'<th id="th_1_1">1_1</th>' +
+				'<th colspan="2" id="th_1_2">1_2</th>' +
+				'<th id="th_1_4">1_4</th>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td colspan="2" id="td_2_1"><span id="span_2_1">2_1</span>2_2</td>' +
+				'<td id="td_2_3" rowspan="2">2_3</td>' +
+				'<td id="td_2_4">2_4</td>' +
+			'</tr>' +
+			'<tr id="tr_3">' +
+				'<td id="td_3_1">3_1</td>' +
+				'<td id="td_3_2">3_2</td>' +
+				'<td id="td_3_4">3_4</td>' +
+			'</tr>' +
+			'<tr id="tr_4">' +
+				'<td id="td_4_1">4_1</td>' +
+				'<td id="td_4_2">4_2</td>' +
+				'<td id="td_4_3">4_3</td>' +
+				'<td id="td_4_4">4_4</td>' +
+			'</tr>' +
+		'</tbody>' +
+	'</table>';
+
 	test("Merge simple first cell", function() {
 		expect(4);
 
@@ -967,6 +1028,17 @@ function runTableTests() {
 
 		testRowMerge(
 			mergeTableHtml, mergeTh11To14Html, '#th_1_1', '#th_1_4', '#th_1_1' );
+	});
+
+	test("With span", function() {
+		expect(4);
+
+		var endSelection = '#td_2_1';
+		if ( isInnerSelector ) {
+			var endSelection = '#span_2_1';
+		}
+		testRowMerge(
+			mergeTableHtml, mergeSpan21Html, '#span_2_1', '#td_2_2', endSelection );
 	});
 
 
