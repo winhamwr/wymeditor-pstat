@@ -85,6 +85,17 @@ function testRowMerge( startHtml, endHtml, startSelector, endSelector, finalSele
 	}
 }
 
+function testGetCellXIndex( startHtml, cellSelector, expectedIndex ) {
+	var wymeditor = jQuery.wymeditors(0);
+	wymeditor.html( startHtml );
+
+	var $body = $(wymeditor._doc).find('body.wym_iframe');
+	var cell = $body.find(cellSelector)[0];
+
+	var actual = wymeditor.tableEditor.getCellXIndex(cell);
+	equals( actual, expectedIndex );
+}
+
 /**
 * Determine if attempting to select a cell with a non-text inner node (a span)
 * actually selects the inner node or selects the cell itself. FF for example,
@@ -1022,6 +1033,7 @@ function runTableTests() {
 		'</tbody>' +
 	'</table>';
 
+	// Rowspan merges
 	var mergeTd23Html = '' +
 	'<table>' +
 		'<tbody>' +
@@ -1342,6 +1354,16 @@ function runTableTests() {
 
 		testRowMerge(
 			mergeTableHtml, mergeTd32Td23LongRowspanHtml, '#td_3_2', '#td_2_3', '#td_3_2' );
+	});
+
+	test("getCellXIndex test", function() {
+		expect(5);
+
+		testGetCellXIndex(mergeTableHtml, '#th_1_1', 0);
+		testGetCellXIndex(mergeTableHtml, '#th_1_4', 3);
+		testGetCellXIndex(mergeTableHtml, '#td_2_3', 2);
+		testGetCellXIndex(mergeTableHtml, '#td_3_4', 3);
+		testGetCellXIndex(mergeTableLongRowspanHtml, '#td_4_4', 3);
 	});
 
 	module("utils");

@@ -145,13 +145,76 @@ TableEditor.prototype.getNumColumns = function(tr) {
 	return numColumns;
 }
 
+TableEditor.prototype.getCellXIndex = function(cell) {
+	var tableEditor = this;
+	var parentTr = $(cell).parent('tr')[0];
+
+	var baseRowColumns = this.getNumColumns(parentTr);
+
+	// Figure out how many explicit cells are missing which is how many rowspans
+	// we're affected by
+	var rowColCount = 0;
+	$(parentTr).children('td,th').each( function(index, elmnt) {
+		var colspan = $(elmnt).attr('colspan');
+		if( colspan == null ) {
+			colspan = 1;
+		}
+		rowColCount += parseInt(colspan);
+	});
+
+	var missingCells = baseRowColumns - rowColCount;
+	var rowspanIndexes = [];
+	var checkTr = parentTr;
+	var rowOffset = 1;
+	while ( missingCells > 0 ) {
+		checkTr = $(checkTr).prev('tr');
+		rowOffset += 1;
+		$(checkTr).children('td,th').each( function(index, elmnt) {
+			if ( $(elmnt).attr('rowspan') && $(elmnt).attr('rowspan') >= rowOffset ) {
+				// Actually affects our source row
+				missingCells -= 1;
+				var colspan = $(elmnt).attr('colspan');
+				if( colspan == null ) {
+					colspan = 1;
+				}
+				rowspanIndexes[tableEditor.getCellXIndex(elmnt)] = colspan;
+			}
+		});
+	}
+
+	var indexCounter = 0;
+	var cellIndex = null;
+	$(parentTr).children('td,th').each( function(index, elmnt) {
+		if ( cellIndex != null ) {
+			return;
+		}
+		while ( typeof(rowspanIndexes[indexCounter]) != 'undefined' ) {
+			indexCounter += parseInt(rowspanIndexes[indexCounter]);
+		}
+		if ( elmnt == cell ) {
+			cellIndex = indexCounter;
+			return;
+		}
+		var colspan = $(elmnt).attr('colspan');
+		if( colspan == null ) {
+			colspan = 1;
+		}
+		indexCounter += parseInt(colspan);
+	});
+
+	if ( cellIndex == null ) {
+		throw "Cell index not found";
+	}
+	return cellIndex;
+}
+
 /**
 * Get the number of columns represented by the given array of contiguous cell
 * (td/th) nodes.
 * Accounts for colspan and rowspan attributes.
 */
 TableEditor.prototype.getTotalColumns = function(cells) {
-	var wym = this._wym;
+	var tableEditor = this;
 	var baseRowColumns = 0; // Number of columns in a uniform table row
 
 	var rootTr = this.getCommonParentTr(cells);
@@ -188,7 +251,16 @@ TableEditor.prototype.getTotalColumns = function(cells) {
 		// Easy case. No rowspans to deal with
 		return colspanCount;
 	} else {
-		throw "AHHH!. rowspans";
+		if ( cells.length == 1 ) {
+			// Easy. Just the colspan
+			var colspan = $(cells[0]).attr('colspan');
+			if( colspan == null ) {
+				colspan = 1;
+			}
+			return colspan;
+		} else {
+			return 1 + tableEditor.getCellXIndex($(cells).eq(-1)) - tableEditor.getCellXIndex($(cells).eq(0));
+		}
 	}
 }
 
@@ -197,6 +269,7 @@ TableEditor.prototype.getTotalColumns = function(cells) {
 */
 TableEditor.prototype.mergeRow = function(sel) {
 	var wym = this._wym;
+	var tableEditor = this;
 
 	if ( sel.rangeCount == 0 ) {
 		return false;
@@ -215,6 +288,47 @@ TableEditor.prototype.mergeRow = function(sel) {
 	if ( rootTr == null ) {
 		return false;
 	}
+
+	// If any of the cells have a rowspan, create the inferred cells
+	$(cells).each( function(index, elmnt) {
+		var $elmnt = $(elmnt);
+		if ( $elmnt.attr('rowspan') != null && $elmnt.attr('rowspan') > 1 ) {
+			// Figure out the x index for this cell in the table grid
+			var prevCells = $elmnt.prevAll('td,th');
+			var index = tableEditor.getCellXIndex(elmnt);
+
+			// Create the previously-inferred cell in the appropriate index
+			// with one less rowspan
+			var newRowspan = $elmnt.attr('rowspan') - 1
+			if ( newRowspan == 1 ) {
+				var newTd = '<td>' + $elmnt.html() + '</td>';
+			} else {
+				var newTd = '' +
+					'<td rowspan="' + newRowspan + '">' +
+						$elmnt.html() +
+					'</td>';
+			}
+			// TODO: account for colspan/rowspan with insertion
+			if ( index == 0 ) {
+				$elmnt.parent('tr')
+					.next('tr')
+					.prepend(newTd);
+			} else {
+				var insertionIndex = index - 1; // Appending to the prev node
+				$elmnt.parent('tr')
+					.next('tr')
+					.find('td:eq('+insertionIndex+')')
+					.append(newTd);
+			}
+
+			// Clear the cell's html, since we just moved it down
+			$elmnt.html('');
+		}
+	});
+
+	// Remove any rowspan from the mergecell now that we've shifted rowspans
+	// down
+	$(mergeCell).removeAttr('rowspan');
 
 	// Build the content of the new combined cell from all of the included cells
 	var newContent = '';
