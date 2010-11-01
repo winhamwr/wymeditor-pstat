@@ -381,6 +381,16 @@ TableEditor.prototype.addRow = function(elmnt) {
 	return false;
 };
 
+/**
+* Remove the given table if it doesn't have any rows/columns.
+*/
+TableEditor.prototype.removeEmptyTable = function(table) {
+	var cells = $(table).find('td,th');
+	if ( cells.length == 0 ) {
+		$(table).remove();
+	}
+};
+
 /*
 	* Remove the row for the given element (representing a <tr> or a child
 	* of a <tr>).
@@ -391,7 +401,9 @@ TableEditor.prototype.removeRow = function(elmnt) {
 	if ( tr == null ) {
 		return false;
 	}
+	var table = wym.findUp(elmnt, 'table');
 	$(tr).remove();
+	this.removeEmptyTable(table);
 
 	return false;
 };
@@ -434,6 +446,7 @@ TableEditor.prototype.removeColumn = function(elmnt) {
 	if ( td == null ) {
 		return false;
 	}
+	var table = wym.findUp(elmnt, 'table');
 	var prevTds = $(td).prevAll();
 	var tdIndex = prevTds.length;
 
@@ -442,6 +455,7 @@ TableEditor.prototype.removeColumn = function(elmnt) {
 		$(element).find('td,th').eq(tdIndex).remove();
 	});
 	$(td).remove();
+	this.removeEmptyTable(table);
 
 	return false;
 };
