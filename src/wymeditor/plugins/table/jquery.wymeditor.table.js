@@ -20,6 +20,7 @@ function TableEditor(options, wym) {
 	options = jQuery.extend({
 		sMergeRowButtonHtml:   "<li class='wym_tools_merge_row'>"
 			+ "<a name='merge_row' href='#'"
+			+ " title='Merge Cells' "
 			+ " style='background-image:"
 			+ " url(" + wym._options.basePath + "plugins/table/table_join_row.png)'>"
 			+ "Merge Table Row"
@@ -29,6 +30,7 @@ function TableEditor(options, wym) {
 
 		sAddRowButtonHtml:   "<li class='wym_tools_add_row'>"
 			+ "<a name='add_row' href='#'"
+			+ " title='Add Row' "
 			+ " style='background-image:"
 			+ " url(" + wym._options.basePath + "plugins/table/table_insert_row.png)'>"
 			+ "Add Table Row"
@@ -38,6 +40,7 @@ function TableEditor(options, wym) {
 
 		sRemoveRowButtonHtml:   "<li class='wym_tools_remove_row'>"
 			+ "<a name='remove_row' href='#'"
+			+ " title='Remove Row' "
 			+ " style='background-image:"
 			+ " url(" + wym._options.basePath + "plugins/table/table_delete_row.png)'>"
 			+ "Remove Table Row"
@@ -47,6 +50,7 @@ function TableEditor(options, wym) {
 
 		sAddColumnButtonHtml:   "<li class='wym_tools_add_column'>"
 			+ "<a name='add_column' href='#'"
+			+ " title='Add Column' "
 			+ " style='background-image:"
 			+ " url(" + wym._options.basePath + "plugins/table/table_insert_column.png)'>"
 			+ "Add Table Column"
@@ -56,6 +60,7 @@ function TableEditor(options, wym) {
 
 		sRemoveColumnButtonHtml:   "<li class='wym_tools_remove_column'>"
 			+ "<a name='remove_column' href='#'"
+			+ " title='Remove Column' "
 			+ " style='background-image:"
 			+ " url(" + wym._options.basePath + "plugins/table/table_delete_column.png)'>"
 			+ "Remove Table Column"
