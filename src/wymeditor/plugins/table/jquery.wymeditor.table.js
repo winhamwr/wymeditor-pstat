@@ -264,7 +264,11 @@ TableEditor.prototype.getTotalColumns = function(cells) {
 			}
 			return colspan;
 		} else {
-			return 1 + tableEditor.getCellXIndex($(cells).eq(-1)) - tableEditor.getCellXIndex($(cells).eq(0));
+			var lastCell = $(cells).eq(cells.length - 1)[0];
+			var firstCell = $(cells).eq(0)[0];
+			// On jQuery 1.4 upgrade, $(cells).eq(-1)
+			return 1 + tableEditor.getCellXIndex(lastCell)
+				- tableEditor.getCellXIndex(firstCell);
 		}
 	}
 }
@@ -276,11 +280,14 @@ TableEditor.prototype.mergeRow = function(sel) {
 	var wym = this._wym;
 	var tableEditor = this;
 
-	if ( sel.rangeCount == 0 ) {
+	if ( sel.rangeCount == 0 || sel.rangeCount > 1 ) {
 		return false;
 	}
 
 	var range = sel.getRangeAt(0);
+	if ( ! $(range.commonAncestorContainer).is('tr') ) {
+		return false;
+	}
 
 	var nodes = range.getNodes(false);
 	var cells = $(nodes).filter('td,th');
@@ -313,17 +320,30 @@ TableEditor.prototype.mergeRow = function(sel) {
 						$elmnt.html() +
 					'</td>';
 			}
-			// TODO: account for colspan/rowspan with insertion
 			if ( index == 0 ) {
 				$elmnt.parent('tr')
 					.next('tr')
 					.prepend(newTd);
 			} else {
-				var insertionIndex = index - 1; // Appending to the prev node
-				$elmnt.parent('tr')
-					.next('tr')
-					.find('td:eq('+insertionIndex+')')
-					.append(newTd);
+				// TODO: account for colspan/rowspan with insertion
+				// Account for colspan/rowspan by walking to the left looking
+				// for the cell closest to the desired index to APPEND to
+				var insertionIndex = index - 1;
+				var insertionCells = $elmnt.parent('tr').next('tr')
+					.find('td,th');
+				var cellInserted = false;
+				for ( i = insertionCells.length - 1; i >= 0; i-- ) {
+					var xIndex = tableEditor.getCellXIndex(insertionCells[i]);
+					if ( xIndex <= insertionIndex ) {
+						$(insertionCells[i]).append(newTd);
+						cellInserted = true;
+						break;
+					}
+				}
+				if ( ! cellInserted ) {
+					// Bail out now before we clear HTML and break things
+					throw "Cell rowspan invalid";
+				}
 			}
 
 			// Clear the cell's html, since we just moved it down
@@ -333,7 +353,12 @@ TableEditor.prototype.mergeRow = function(sel) {
 
 	// Remove any rowspan from the mergecell now that we've shifted rowspans
 	// down
-	$(mergeCell).removeAttr('rowspan');
+	// ie fails when we try to remove a rowspan for some reason
+	try {
+		$(mergeCell).removeAttr('rowspan');
+	} catch(err) {
+		$(mergeCell).attr('rowspan', 1);
+	}
 
 	// Build the content of the new combined cell from all of the included cells
 	var newContent = '';
@@ -343,7 +368,12 @@ TableEditor.prototype.mergeRow = function(sel) {
 
 	// Add a colspan to the farthest-left cell
 	var combinedColspan = this.getTotalColumns(cells);
-	$(mergeCell).attr('colspan', combinedColspan);
+	if ( $.browser.msie ) {
+		// jQuery.attr doesn't work for colspan in ie
+		mergeCell.colSpan = combinedColspan;
+	} else {
+		$(mergeCell).attr('colspan', combinedColspan);
+	}
 
 	// Delete the rest of the cells
 	$(cells).each( function(index, elmnt) {
@@ -515,7 +545,11 @@ TableEditor.prototype.selectElement = function(elmnt) {
 	range.setEnd( elmnt, 0 );
 	range.collapse(false);
 
-	sel.setSingleRange( range );
+	try {
+		sel.setSingleRange( range );
+	} catch(err) {
+		// ie8 can raise an "unkown runtime error" trying to empty the range
+	}
 	// IE selection hack
 	if ( $.browser.msie ) {
 		this._wym.saveCaret();

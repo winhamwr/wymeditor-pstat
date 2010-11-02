@@ -1376,21 +1376,21 @@ function runTableTests() {
 		expect(4);
 
 		testRowMerge(
-			mergeTableHtml, mergeTd42Td23LongRowspanHtml, '#td_4_2', '#td_2_3', '#td_4_2' );
+			mergeTableLongRowspanHtml, mergeTd42Td23LongRowspanHtml, '#td_4_2', '#td_2_3', '#td_4_2' );
 	});
 
 	test("Below and after bottom of long rowspan", function() {
 		expect(4);
 
 		testRowMerge(
-			mergeTableHtml, mergeTd23Td44LongRowspanHtml, '#td_2_3', '#td_4_4', '#td_4_2 + td' );
+			mergeTableLongRowspanHtml, mergeTd23Td44LongRowspanHtml, '#td_2_3', '#td_4_4', '#td_4_2 + td' );
 	});
 
 	test("Middle of rowspan doesn't merge", function() {
 		expect(4);
 
 		testRowMerge(
-			mergeTableHtml, mergeTd32Td23LongRowspanHtml, '#td_3_2', '#td_2_3', '#td_3_2' );
+			mergeTableLongRowspanHtml, mergeTd32Td23LongRowspanHtml, '#td_3_2', '#td_2_3', '#td_3_2' );
 	});
 
 	test("getCellXIndex test", function() {
