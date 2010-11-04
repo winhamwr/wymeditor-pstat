@@ -280,27 +280,24 @@ TableEditor.prototype.mergeRow = function(sel) {
 	var wym = this._wym;
 	var tableEditor = this;
 
-	if ( sel.rangeCount == 0 || sel.rangeCount > 1 ) {
-		return false;
+	var nodes = [];
+	var range = null;
+	for ( var i = 0; i < sel.rangeCount; i++ ) {
+		range = sel.getRangeAt(i);
+		nodes = nodes.concat(range.getNodes(false));
 	}
 
-	var range = sel.getRangeAt(0);
-	if ( ! $(range.commonAncestorContainer).is('tr') ) {
-		return false;
-	}
-
-	var nodes = range.getNodes(false);
 	var cells = $(nodes).filter('td,th');
 	if ( cells.length == 0 ) {
 		return false;
 	}
-	var mergeCell = cells[0];
 
-	var rootTr = this.getCommonParentTr(cells);
+	var rootTr = tableEditor.getCommonParentTr(cells);
 	if ( rootTr == null ) {
 		return false;
 	}
 
+	var mergeCell = cells[0];
 	// If any of the cells have a rowspan, create the inferred cells
 	$(cells).each( function(index, elmnt) {
 		var $elmnt = $(elmnt);
