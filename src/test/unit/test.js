@@ -70,6 +70,33 @@ test("Should remove PRE line breaks (BR)", function() {
 	equals( jQuery.wymeditors(0).parser.parse(original), expected, "Remove BR in PRE" );
 });
 
+test("Shouldn't strip colSpan attributes", function() {
+	// http://trac.wymeditor.org/trac/ticket/223
+	// IE8 uses colSpan for the colspan attribute. WYMeditor shouldn't strip it
+	// just because of the camelCase
+	expect(1);
+	var original = '' +
+	'<table>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1" colSpan="2">1_1</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1">2_1</td>' +
+				'<td id="td_2_2">2_2</td>' +
+			'</tr>' +
+	'</table>';
+	var expected = '' +
+	'<table>' +
+			'<tr id="tr_1">' +
+				'<td id="td_1_1" colspan="2">1_1</td>' +
+			'</tr>' +
+			'<tr id="tr_2">' +
+				'<td id="td_2_1">2_1</td>' +
+				'<td id="td_2_2">2_2</td>' +
+			'</tr>' +
+	'</table>';
+	equals( jQuery.wymeditors(0).parser.parse(original), expected, "Don't strip colSpan" );
+});
 
 
 function runPostInitTests() {

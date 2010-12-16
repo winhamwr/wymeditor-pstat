@@ -2508,6 +2508,7 @@ WYMeditor.XhtmlValidator = {
     var possible_attributes = this.getPossibleTagAttributes(tag);
     for(var attribute in attributes) {
       var value = attributes[attribute];
+      attribute = attribute.toLowerCase(); // Fix for #223. ie8 uses colSpan
       var h = WYMeditor.Helper;
       if(!h.contains(this.skiped_attributes, attribute) && !h.contains(this.skiped_attribute_values, value)){
         if (typeof value != 'function' && h.contains(possible_attributes, attribute)) {
